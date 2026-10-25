@@ -1,7 +1,8 @@
 // The pages that run on the TV (launcher, manager, picker, notification card): nothing newer than Chromium 68 (webOS 5), and fixes that
 // must not come back.
 const fs = require('fs'),
-  path = require('path');
+  path = require('path'),
+  vm = require('vm');
 const { root, ok, run } = require('./lib');
 
 run(async () => {
@@ -93,5 +94,28 @@ run(async () => {
   ok(
     !/(^|\n)\s*\.st\s*\{/.test(launcher) && /svg\.st\s*\{\s*width:\s*26px/.test(launcher),
     "the favourite star is styled as svg.st, so the menu's .st text keeps its natural width"
+  );
+
+  // LG's Home from the launcher: the last row of Customise, behind a confirmation whose first (focused) row is Cancel
+  const calls = [],
+    opened = [];
+  const sb = vm.createContext({
+    navigator: { userAgent: '' },
+    cfg: {},
+    t: k => k,
+    toast() {},
+    api: (p, b) => (calls.push([p, b]), Promise.resolve({ returnValue: true })),
+  });
+  vm.runInContext(fs.readFileSync(path.join(root, 'app', 'src', 'js', 'menus.js'), 'utf8'), sb);
+  sb.openMenu = (title, items) => opened.push({ title, items });
+  sb.customizeMenu();
+  const lg = opened[0].items[opened[0].items.length - 1];
+  lg.fn();
+  const confirm = opened[1];
+  const cancelled = confirm.items[0].label === 'Cancel' && confirm.items[0].fn === sb.backMenu && calls.length === 0;
+  confirm.items[1].fn();
+  ok(
+    lg.label === 'LG’s Home' && lg.stay && cancelled && calls.length === 1 && calls[0][0] === '/api/undo' && !!calls[0][1],
+    "Customise ends with LG's Home; its confirmation starts with Cancel and only Yes posts /api/undo"
   );
 });

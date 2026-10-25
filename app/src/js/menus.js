@@ -319,6 +319,28 @@ function customizeMenu() {
         saveCfg();
       },
     },
+    { label: t('LG’s Home'), sub: t('the TV restarts'), stay: true, fn: lgHomeMenu },
+  ]);
+}
+/* Back to LG's Home without the manager app, kept deep in Customise and behind a confirmation whose first, focused row is Cancel,
+   so a stray OK does not switch. The service restarts the TV; CleanYourTV as Home in the manager app switches back. */
+function lgHomeMenu() {
+  openMenu(t('Use LG’s Home?'), [
+    { label: t('Cancel'), stay: true, fn: backMenu },
+    {
+      label: t('Yes, use LG’s Home'),
+      sub: t('the TV restarts'),
+      fn: function () {
+        api('/api/undo', {}).then(
+          function () {
+            toast(t('Switching to LG’s Home… the TV restarts in a moment.'));
+          },
+          function () {
+            toast(t('Could not switch to LG’s Home'));
+          }
+        );
+      },
+    },
   ]);
 }
 function topButtonsMenu() {

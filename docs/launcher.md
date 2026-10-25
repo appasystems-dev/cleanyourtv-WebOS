@@ -49,7 +49,9 @@ system apps are never in it. The list is read when it opens and closes when you 
 - **hidden apps** (show them again),
 - the **app order** (most used first, or A to Z),
 - the **clock** format (automatic, 12 or 24 hour),
-- **Reset customisation**.
+- **Reset customisation**,
+- **LG’s Home**: switches back to LG’s Home after a confirmation whose first row is **Cancel**, and restarts the TV.
+  Kept here rather than on the home screen so it is not chosen by accident; **CleanYourTV as Home** in the manager app switches back.
 
 The dock holds up to four apps. Hold OK on an app and choose **Add to dock**, **Move left**, **Move right** or **Remove from dock**.
 
@@ -71,7 +73,7 @@ into the tile, and the ambient glow comes from the icon's most vivid colour. Col
 
 ## Language
 
-Menus follow the TV's language: English, Dutch, German, French and Spanish.
+Menus follow the TV's language: English, Dutch, German, French, Spanish and Croatian.
 
 ## Themes
 

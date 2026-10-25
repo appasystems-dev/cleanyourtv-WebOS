@@ -41,7 +41,7 @@ Switching restarts the TV (about a minute).
 
 | Action | How |
 |---|---|
-| Use LG's Home | **CleanYourTV as Home** off in the manager app. |
+| Use LG's Home | **CleanYourTV as Home** off in the manager app, or **Customise** > **LG’s Home** on the home screen. |
 | Use the launcher again | **CleanYourTV as Home** on, from LG's app list. |
 | Over SSH | `touch /media/developer/cleanyourtv/DISABLE; reboot` for LG's Home, `rm /media/developer/cleanyourtv/DISABLE; reboot` for ours. |
 | Failed boot | The Homebrew Channel's failsafe mode skips all boot scripts; reboot again. |
