@@ -89,8 +89,14 @@ Radi se na računalu, a TV služi za konačnu provjeru.
 | Warm | Smeđa i jantarna |
 | Bloom | Cvjetna pozadina, traka u staklenom panelu dolje |
 | Horizon | Krajolik u sumrak, 7 aplikacija dolje, sat gore lijevo |
+| **Sidebar** (naša) | Traka lijevo (kućica, HDMI ulazi, postavke), gore desno samo gumb *Tema*, jedan red od 7 aplikacija dolje; strelica dolje pokaže još dva reda |
 
-Slike: `docs/screenshots/themes-1.jpg` do `themes-4.jpg`. Teme koje su napravili drugi korisnici zasad ne postoje.
+Slike: `docs/screenshots/themes-1.jpg` do `themes-5.jpg`.
+
+Za Sidebar je launcher dobio novu postavku teme `rail.*` (traka uz lijevi rub) i gumb **Tema**, koji nabraja teme kao manager
+(Tema) i na kraju ima *Prilagodi*, jer u toj temi gore nema drugog gumba. Live TV nije na traci jer je već pločica među aplikacijama.
+Red dolje pokazuje aplikacije iz docka: zadano su samo 4, ostale se dodaju s *Držite OK → Dodaj u traku*.
+Pregled na Windowsu: `node --experimental-websocket tools/theme-preview.mjs sidebar --out <mapa>` (Node 20; Node 22 ne treba zastavicu). Teme koje su napravili drugi korisnici zasad ne postoje.
 
 ## Sljedeći koraci
 

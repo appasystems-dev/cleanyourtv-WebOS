@@ -93,6 +93,20 @@ run(async () => {
     'effects are clamped, a wallpaper path is refused and unknown keys are dropped'
   );
   ok(themeMod.normalize({}, '../x') === null, 'a bad theme id is refused');
+  const rl = themeMod.resolve(themeMod.normalize({ bar: { show: false }, rail: { show: true, width: 999, panel: 0.5 } }, 'rl')),
+    nr = themeMod.resolve(themeMod.normalize({}, 'nr'));
+  ok(
+    rl.rail === true &&
+      rl.attrs.rail === 'on' &&
+      rl.vars['--rail-d'] === 'flex' &&
+      rl.vars['--rail-w'] === '240px' &&
+      rl.vars['--bar-d'] === 'flex' &&
+      /,0\.5\)$/.test(rl.vars['--rail-bg']) &&
+      nr.rail === false &&
+      nr.attrs.rail === 'off' &&
+      nr.vars['--rail-d'] === 'none',
+    'the strip on the left is off by default; on, its width is clamped and the top bar stays for the Theme button'
+  );
   const tbase = themeMod.normalize({ grid: { cols: 7 }, dock: { count: 6 } }, 'base'),
     tkid = themeMod.normalize({ grid: { cols: 'many' }, bar: { style: 'round' } }, 'kid', tbase.v);
   ok(

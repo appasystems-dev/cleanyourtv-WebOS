@@ -118,4 +118,115 @@ run(async () => {
     lg.label === 'LG’s Home' && lg.stay && cancelled && calls.length === 1 && calls[0][0] === '/api/undo' && !!calls[0][1],
     "Customise ends with LG's Home; its confirmation starts with Cancel and only Yes posts /api/undo"
   );
+
+  // the Theme button (themes with the strip on the left): the themes with the current one marked, Customise last; a pick sets it
+  calls.length = 0;
+  opened.length = 0;
+  let loads = 0;
+  sb.stack = [];
+  sb.drawMenu = () => {};
+  sb.load = () => loads++;
+  sb.api = (p, b) => (
+    calls.push([p, b]),
+    Promise.resolve(
+      p === '/api/theme/list'
+        ? {
+            current: { id: 'sidebar' },
+            themes: [
+              { id: 'classic', name: 'Classic' },
+              { id: 'sidebar', name: 'Sidebar' },
+            ],
+          }
+        : {}
+    )
+  );
+  sb.openMenu = (title, items) => (opened.push({ title, items }), sb.stack.push({ items, idx: 0 }));
+  sb.themeMenu();
+  await new Promise(res => setTimeout(res, 0));
+  const tm = opened[0],
+    tlast = tm.items[tm.items.length - 1];
+  tm.items[1].fn();
+  tm.items[0].fn();
+  await new Promise(res => setTimeout(res, 0));
+  ok(
+    tm.title === 'Theme' &&
+      tm.items[1].sub === 'selected' &&
+      sb.stack[0].idx === 1 &&
+      tlast.label === 'Customise' &&
+      tlast.stay &&
+      tlast.fn === sb.customizeMenu &&
+      calls.length === 2 &&
+      calls[1][0] === '/api/theme/set' &&
+      calls[1][1].id === 'classic' &&
+      loads === 1,
+    'the Theme menu marks the current theme, ends with Customise, and a pick sets the theme and reloads the page'
+  );
+
+  // the strip on the left: Left from the first app goes to it, Up and Down move along it, Right goes back to the same app
+  const el = () => {
+    const s = new Set();
+    return {
+      style: {},
+      textContent: '',
+      classList: {
+        add: k => s.add(k),
+        remove: k => s.delete(k),
+        toggle: (k, on) => (on ? s.add(k) : s.delete(k)),
+        contains: k => s.has(k),
+      },
+    };
+  };
+  const els = {},
+    keys = {};
+  const ps = vm.createContext({
+    document: { addEventListener: (n, f) => (keys[n] = f), body: el() },
+    performance: { now: () => Date.now() },
+    setInterval() {},
+    setTimeout,
+    clearTimeout,
+    Date,
+    Math,
+    LOC: 'en-GB',
+    clockOpts: () => ({}),
+    $: id => els[id] || (els[id] = el()),
+    LIVE: { on: false },
+    stack: [],
+    t: k => k,
+    glowNow() {},
+    glowSoon() {},
+    TH: { push: null, overlay: false, rail: true, tileH: 150, gapY: 60, gt: 350, viewH: 780 },
+    r: 1,
+    c: 0,
+    ri: -1,
+  });
+  vm.runInContext(fs.readFileSync(path.join(root, 'app', 'src', 'js', 'theme.js'), 'utf8'), ps);
+  vm.runInContext(fs.readFileSync(path.join(root, 'app', 'src', 'js', 'input.js'), 'utf8'), ps);
+  ps.barLabel = o => o.label;
+  ps.TH = { push: null, overlay: false, rail: true, tileH: 150, gapY: 60, gt: 350, viewH: 780 };
+  const bt = l => Object.assign(el(), { _o: { label: l } }),
+    tile = l => Object.assign(el(), { _a: { id: l, title: l } });
+  ps.railEls = [bt('Home'), bt('Inputs'), bt('Settings')];
+  ps.rows = [[bt('Theme')], [tile('a'), tile('b')], [tile('c'), tile('d')]];
+  ps.setFocus(2, 0, true);
+  const press = k => keys.keydown({ keyCode: k, preventDefault() {} });
+  press(37);
+  const inRail = ps.ri === 0 && ps.railEls[0].classList.contains('f') && !ps.rows[2][0].classList.contains('f');
+  press(40);
+  press(40);
+  press(40);
+  const atEnd = ps.ri === 2 && ps.focused() === ps.railEls[2] && !ps.railEls[0].classList.contains('f');
+  press(39);
+  ok(
+    inRail &&
+      atEnd &&
+      ps.ri === -1 &&
+      ps.r === 2 &&
+      ps.c === 0 &&
+      ps.rows[2][0].classList.contains('f') &&
+      !ps.railEls[2].classList.contains('f'),
+    'Left from the first app goes to the strip, Down stops at its end, Right goes back to the same app'
+  );
+  press(37);
+  press(461);
+  ok(ps.ri === -1 && ps.focused() === ps.rows[2][0], 'Back on the strip goes back to the apps');
 });

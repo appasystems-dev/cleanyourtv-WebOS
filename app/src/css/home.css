@@ -38,6 +38,11 @@
   --bar-b: auto;
   --bar-tx: none;
   --bar-d: flex;
+  --rail-d: none;
+  --rail-w: 128px;
+  --rail-s: 72px;
+  --rail-gap: 28px;
+  --rail-bg: none;
   --name-d: block;
   --name-x: 96px;
   --name-y: 150px;
@@ -208,6 +213,45 @@ body {
 [data-labels="hide"] .pill span {
   display: none;
 }
+/* the strip along the left edge (theme rail.show): round icon buttons, centred top to bottom */
+#rail {
+  pointer-events: auto;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--rail-w);
+  height: 1080px;
+  display: var(--rail-d);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--rail-bg);
+  box-shadow: inset -1px 0 0 var(--pill-ring);
+}
+#rail > * + * {
+  margin-top: var(--rail-gap);
+}
+.rb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--rail-s);
+  height: var(--rail-s);
+  border-radius: 50%;
+  background: var(--pill-bg);
+  box-shadow: inset 0 0 0 1px var(--pill-ring);
+  transition: transform calc(0.12s * var(--spd)) cubic-bezier(0.3, 1.35, 0.5, 1);
+  will-change: transform;
+}
+.rb svg {
+  width: calc(var(--rail-s) * 0.46);
+  height: calc(var(--rail-s) * 0.46);
+}
+.rb.f {
+  background: var(--acc);
+  color: var(--acc-ink);
+  transform: scale(1.1);
+}
 
 #shelf {
   position: absolute;
@@ -350,7 +394,8 @@ body {
   transition: transform calc(0.12s * var(--spd)) cubic-bezier(0.3, 1.35, 0.5, 1);
 }
 .snap .tile,
-.snap .pill {
+.snap .pill,
+.snap .rb {
   transition: none;
 } /* held arrow key: follow the focus without animating each step */
 .tile.fill {

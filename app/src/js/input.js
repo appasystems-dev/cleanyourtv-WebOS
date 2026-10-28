@@ -47,9 +47,12 @@ document.addEventListener('mousemove', function (ev) {
   if (Math.abs(ev.clientX - lastMX) + Math.abs(ev.clientY - lastMY) < 24) return;
   lastMX = ev.clientX;
   lastMY = ev.clientY;
-  var el = ev.target.closest ? ev.target.closest('.tile,.pill') : null,
-    p = el && posOf(el);
-  if (p && !(p[0] === r && p[1] === c)) setFocus(p[0], p[1]);
+  var el = ev.target.closest ? ev.target.closest('.tile,.pill,.rb') : null,
+    p = el && posOf(el),
+    q = el ? railEls.indexOf(el) : -1;
+  if (q >= 0) {
+    if (q !== ri) railFocus(q);
+  } else if (p && (ri >= 0 || !(p[0] === r && p[1] === c))) setFocus(p[0], p[1]);
 });
 
 document.addEventListener('keydown', function (e) {
@@ -73,6 +76,15 @@ document.addEventListener('keydown', function (e) {
     if (menuKey(k)) e.preventDefault();
     return;
   }
+  if (ri >= 0 && (k === 461 || k === 27 || k === 8 || k === 39 || k === 38 || k === 40)) {
+    if (k === 38) {
+      if (ri > 0) railFocus(ri - 1);
+    } else if (k === 40) {
+      if (ri < railEls.length - 1) railFocus(ri + 1);
+    } else railLeave();
+    e.preventDefault();
+    return;
+  } /* on the strip: Up and Down move along it, Right and Back go back to the apps */
   if ((TH.overlay || TH.push) && r >= 2 && (k === 461 || k === 27 || k === 8)) {
     setFocus(1, Math.min(c, rows[1].length - 1));
     e.preventDefault();
@@ -95,7 +107,9 @@ document.addEventListener('keydown', function (e) {
     }
     lastMove = tn;
   }
-  if (k === 37 && c > 0) setFocus(r, c - 1);
+  if (k === 37 && ri >= 0) return e.preventDefault();
+  else if (k === 37 && c === 0 && railEls.length) railFocus(0);
+  else if (k === 37 && c > 0) setFocus(r, c - 1);
   else if (k === 39 && c < len - 1) setFocus(r, c + 1);
   else if (k === 38 && r > 0) setFocus(r - 1, mapCol(len, rows[r - 1].length, c));
   else if (k === 40 && r < rows.length - 1) setFocus(r + 1, mapCol(len, rows[r + 1].length, c));
@@ -105,7 +119,7 @@ document.addEventListener('keydown', function (e) {
       downEnter = true;
       held = false;
       clearTimeout(downT);
-      var t = rows[r][c];
+      var t = focused();
       t.classList.add('press');
       downT = setTimeout(function () {
         held = true;
@@ -128,7 +142,7 @@ document.addEventListener('keyup', function (e) {
     downEnter = false;
     return;
   }
-  if (downEnter && !held) act(rows[r][c]);
+  if (downEnter && !held) act(focused());
   downEnter = false;
   held = false;
 });

@@ -1,8 +1,8 @@
 /* ---------- theme: the service resolves the chosen theme (manager > Theme) into CSS variables and a few numbers ---------- */
-var TH0 = { cols: 10, tileH: 151, gapY: 26, gt: 350, viewH: 780, dockN: 4, overlay: false, push: null, overlayH: 510, glow: '' },
+var TH0 = { cols: 10, tileH: 151, gapY: 26, gt: 350, viewH: 780, dockN: 4, rail: false, overlay: false, push: null, overlayH: 510, glow: '' },
   TH = TH0,
   themeKeys = [],
-  themeAttrs = ['data-bar', 'data-labels', 'data-clock', 'data-grid', 'data-galign'];
+  themeAttrs = ['data-bar', 'data-labels', 'data-clock', 'data-grid', 'data-galign', 'data-rail'];
 function applyTheme(t) {
   var st = document.documentElement.style,
     b = document.body,
@@ -33,6 +33,7 @@ function applyTheme(t) {
     gt: t.gt || 350,
     viewH: t.viewH || 780,
     dockN: t.dockN || 4,
+    rail: !!t.rail,
     overlay: !!t.overlay,
     push: t.push || null,
     overlayH: t.overlayH || 510,
@@ -40,9 +41,32 @@ function applyTheme(t) {
   };
 }
 
+/* the strip on the left: its own column; r and c keep the place in the rows, so Right goes back there */
+function focused() {
+  return ri >= 0 ? railEls[ri] : rows[r][c];
+}
+function railFocus(i) {
+  var old = focused();
+  if (old) old.classList.remove('f');
+  ri = i;
+  var e = railEls[i],
+    n = $('name'),
+    nm = barLabel(e._o);
+  e.classList.add('f');
+  if (n.textContent !== nm) n.textContent = nm;
+}
+function railLeave(nr, nc) {
+  if (ri >= 0) railEls[ri].classList.remove('f');
+  ri = -1;
+  setFocus(nr === undefined ? r : nr, nc === undefined ? c : nc);
+}
 function setFocus(nr, nc, first) {
   var old = rows[r] && rows[r][c];
   if (old) old.classList.remove('f');
+  if (ri >= 0) {
+    railEls[ri].classList.remove('f');
+    ri = -1;
+  }
   r = nr;
   c = Math.min(nc, rows[r].length - 1);
   var e = rows[r][c];

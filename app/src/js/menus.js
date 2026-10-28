@@ -343,6 +343,40 @@ function lgHomeMenu() {
     },
   ]);
 }
+/* the Theme button (themes with the strip on the left): the themes of manager > Theme, and Customise, which has no button of its own then */
+function themeMenu() {
+  api('/api/theme/list').then(
+    function (x) {
+      var cur = (x.current && x.current.id) || '',
+        items = (x.themes || []).map(function (th) {
+          return {
+            label: th.name,
+            sub: th.id === cur ? t('selected') : '',
+            fn: function () {
+              if (th.id === cur) return;
+              toast(t('Getting the theme…'));
+              api('/api/theme/set', { id: th.id }).then(
+                function (y) {
+                  if (y.error) toast(t('Could not change the theme'));
+                  else load();
+                },
+                function () {
+                  toast(t('Could not change the theme'));
+                }
+              );
+            },
+          };
+        });
+      items.push({ icon: 'edit', label: t('Customise'), stay: true, fn: customizeMenu });
+      openMenu(t('Theme'), items);
+      for (var i = 0; i < items.length; i++) if (items[i].sub) stack[stack.length - 1].idx = i;
+      drawMenu();
+    },
+    function () {
+      toast(t('Could not read the themes'));
+    }
+  );
+}
 function topButtonsMenu() {
   var items = shownBar().map(function (o) {
     return {

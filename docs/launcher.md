@@ -23,6 +23,7 @@ same on every supported webOS version.
 | Live TV | The **Live TV** button or tile |
 | Switch input | The **Inputs** button |
 | Close running apps | Back on the home screen |
+| The strip on the left (themes such as Sidebar) | Left from the first app; Up and Down along it, Right or Back to the apps |
 
 The Magic Remote pointer works too: pointing and clicking, and holding the button on an app for its options.
 
@@ -52,6 +53,10 @@ system apps are never in it. The list is read when it opens and closes when you 
 - **Reset customisation**,
 - **LG’s Home**: switches back to LG’s Home after a confirmation whose first row is **Cancel**, and restarts the TV.
   Kept here rather than on the home screen so it is not chosen by accident; **CleanYourTV as Home** in the manager app switches back.
+
+A theme can put the buttons in a **strip along the left edge** instead (`rail.show`, the Sidebar theme): **Home** (back to the
+first app, the grid closed), then your top buttons as round icons, without Live TV, which is a tile among the apps. The top bar then
+has only a **Theme** button: it lists the themes, as manager app > Theme does, and **Customise** is its last row.
 
 The dock holds up to four apps. Hold OK on an app and choose **Add to dock**, **Move left**, **Move right** or **Remove from dock**.
 

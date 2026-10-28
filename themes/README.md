@@ -53,6 +53,14 @@ A row of seven square apps along the bottom of a dusk landscape, the clock on th
 
 Folder: [`horizon/`](horizon/)
 
+### Sidebar
+
+A strip on the left with Home, Inputs and Settings, only a Theme button at the top right, and one row of apps at the bottom. Down shows two more rows with the other apps.
+
+[![Sidebar](sidebar/preview.jpg)](sidebar/preview.jpg)
+
+Folder: [`sidebar/`](sidebar/)
+
 ### Compact
 
 Twelve columns of smaller tiles: more apps on screen.

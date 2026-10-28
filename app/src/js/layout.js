@@ -18,10 +18,13 @@ function rebuild() {
   if (oldE) oldE.classList.remove('f');
   var dk = $('dock'),
     gd = $('grid'),
-    bar = $('bar');
+    bar = $('bar'),
+    rl = $('rail');
   dk.textContent = '';
   gd.textContent = '';
   bar.textContent = '';
+  rl.textContent = '';
+  ri = -1;
   var d = dock.map(function (a) {
     var t = tile(a);
     dk.appendChild(t);
@@ -34,18 +37,38 @@ function rebuild() {
     fit(t, false);
     return t;
   });
-  var tb = shownBar()
-    .concat([{ label: 'Customise', icon: 'edit', action: 'customize', fixed: true }])
-    .map(function (o) {
-      var p = document.createElement('div');
-      p.className = 'pill';
-      p._o = o;
-      p.innerHTML = svg(o.icon) + '<span></span>';
-      p.lastChild.textContent = barLabel(o);
-      hit(p);
-      bar.appendChild(p);
-      return p;
-    });
+  /* with the strip on the left (theme rail.show) the top bar has only the Theme button; Live TV is among the apps, so it is left off the strip */
+  railEls = TH.rail
+    ? [{ label: 'Home', icon: 'home', action: 'home', fixed: true }]
+        .concat(
+          shownBar().filter(function (o) {
+            return o.action !== 'live';
+          })
+        )
+        .map(function (o) {
+          var b = document.createElement('div');
+          b.className = 'rb';
+          b._o = o;
+          b.innerHTML = svg(o.action === 'inputs' ? 'hdmi' : o.icon);
+          hit(b);
+          rl.appendChild(b);
+          return b;
+        })
+    : [];
+  var tb = (
+    TH.rail
+      ? [{ label: 'Theme', icon: 'theme', action: 'theme', fixed: true }]
+      : shownBar().concat([{ label: 'Customise', icon: 'edit', action: 'customize', fixed: true }])
+  ).map(function (o) {
+    var p = document.createElement('div');
+    p.className = 'pill';
+    p._o = o;
+    p.innerHTML = svg(o.icon) + '<span></span>';
+    p.lastChild.textContent = barLabel(o);
+    hit(p);
+    bar.appendChild(p);
+    return p;
+  });
   rows = [tb, d.length ? d : tb];
   for (var i = 0; i < g.length; i += TH.cols) rows.push(g.slice(i, i + TH.cols));
   var nr = Math.min(r, rows.length - 1),

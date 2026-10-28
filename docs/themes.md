@@ -34,6 +34,7 @@ folder of the GitHub repository (the `main` branch):
 | Still | No animation and a quiet glow. |
 | Bloom | A flower wallpaper with the dock in a glass panel at the bottom. Down moves the dock up and the apps appear below it, centred. |
 | Horizon | A row of seven square apps along the bottom of a dusk landscape, the clock on the left and the buttons on the right at the top. Down moves the row up and shows all apps below it. |
+| Sidebar | A strip on the left with Home, Inputs and Settings, only a Theme button at the top right, and one row of apps at the bottom. Down shows two more rows with the other apps. The Theme button lists the themes and Customise. |
 
 ![Classic, Compact, Large print and Midnight](screenshots/themes-1.jpg)
 
@@ -42,6 +43,8 @@ folder of the GitHub repository (the `main` branch):
 ![Bloom: the home screen and the app grid opened with Down](screenshots/themes-3.jpg)
 
 ![Horizon: the home screen and all apps shown with Down](screenshots/themes-4.jpg)
+
+![Sidebar: the home screen and two more rows of apps shown with Down](screenshots/themes-5.jpg)
 
 The pictures are the launcher page rendered in a browser with each theme.
 
@@ -169,6 +172,12 @@ when the focus moves down into it (Back or Up closes it); a dock at the top leav
 | `bar.y` | 0 to 900 | `54` | Distance from the top or bottom edge, in px. |
 | `bar.size` | 40 to 100 | `64` | Height of a button, in px. |
 | `bar.gap` | 4 to 40 | `16` | Space between buttons, in px. |
+| **rail** | | | |
+| `rail.show` | `true` or `false` | `false` | A strip along the left edge with round buttons: Home and your buttons (Inputs, Settings, ...). The top bar then has only a Theme button, which lists the themes and Customise. Left from the first app goes to the strip. |
+| `rail.width` | 60 to 240 | `128` | Width of the strip, in px. |
+| `rail.size` | 40 to 100 | `72` | Size of a strip button, in px. |
+| `rail.gap` | 4 to 80 | `28` | Space between strip buttons, in px. |
+| `rail.panel` | 0 to 0.9 | `0.35` | Opacity of the strip, in the panel colour; 0 for none. |
 | **shelf** | | | |
 | `shelf.show` | `true` or `false` | `true` | Show the large name of the focused app. |
 | `shelf.align` | `left`, `center`, `right` | `left` | Text alignment of the name. |

@@ -43,6 +43,11 @@
   --bar-b: auto;
   --bar-tx: none;
   --bar-d: flex;
+  --rail-d: none;
+  --rail-w: 128px;
+  --rail-s: 72px;
+  --rail-gap: 28px;
+  --rail-bg: none;
   --name-d: block;
   --name-x: 96px;
   --name-y: 150px;
@@ -213,6 +218,45 @@ body {
 [data-labels="hide"] .pill span {
   display: none;
 }
+/* the strip along the left edge (theme rail.show): round icon buttons, centred top to bottom */
+#rail {
+  pointer-events: auto;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--rail-w);
+  height: 1080px;
+  display: var(--rail-d);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--rail-bg);
+  box-shadow: inset -1px 0 0 var(--pill-ring);
+}
+#rail > * + * {
+  margin-top: var(--rail-gap);
+}
+.rb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--rail-s);
+  height: var(--rail-s);
+  border-radius: 50%;
+  background: var(--pill-bg);
+  box-shadow: inset 0 0 0 1px var(--pill-ring);
+  transition: transform calc(0.12s * var(--spd)) cubic-bezier(0.3, 1.35, 0.5, 1);
+  will-change: transform;
+}
+.rb svg {
+  width: calc(var(--rail-s) * 0.46);
+  height: calc(var(--rail-s) * 0.46);
+}
+.rb.f {
+  background: var(--acc);
+  color: var(--acc-ink);
+  transform: scale(1.1);
+}
 
 #shelf {
   position: absolute;
@@ -355,7 +399,8 @@ body {
   transition: transform calc(0.12s * var(--spd)) cubic-bezier(0.3, 1.35, 0.5, 1);
 }
 .snap .tile,
-.snap .pill {
+.snap .pill,
+.snap .rb {
   transition: none;
 } /* held arrow key: follow the focus without animating each step */
 .tile.fill {
@@ -1123,7 +1168,7 @@ svg.st {
 }
 </style></head><body>
 <div class="glow" id="gA"></div><div class="glow" id="gB"></div>
-<div id="top"><div id="clock"><div id="time"></div><div id="date"></div></div><div id="bar"></div></div>
+<div id="top"><div id="clock"><div id="time"></div><div id="date"></div></div><div id="bar"></div><div id="rail"></div></div>
 <div id="shelf"><div id="name"></div></div>
 <div id="view"><div id="scroll"><div id="dock"></div><div id="grid"></div></div></div>
 <div id="lv"><div id="lv-stage"></div><div id="lv-spin" class="layer"></div><div id="lv-osd" class="layer"><img class="logo" id="lv-ologo" alt=""><div class="num" id="lv-onum"></div><div class="info"><div class="name" id="lv-oname"></div><div class="now" id="lv-onow"></div><div class="next" id="lv-onext"></div><div class="facts" id="lv-ofacts"></div><div class="pbar"><i id="lv-obar"></i></div></div></div><div id="lv-numin" class="layer"></div><div id="lv-guide" class="layer"><div id="lv-glow"></div><div id="lv-gtop"><div id="lv-gtitle"></div><div id="lv-gtabs"></div><input id="lv-search" type="text" autocomplete="off"><div id="lv-gclock"></div></div><div id="lv-rows"></div><div id="lv-detail"></div></div><div id="lv-filter" class="layer"></div><div id="lv-menu" class="layer"></div><div id="lv-msg" class="layer"></div><div id="lv-tune" class="layer"></div><div id="lv-toast" class="layer"></div><div id="lv-stats" class="layer"></div></div>
@@ -1153,6 +1198,9 @@ var ICONS = {
   grid: '<path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/>',
   hdmi: '<path d="M4 8h16v7l-3 3H7l-3-3z"/><path d="M9 11v3M12 11v3M15 11v3"/>',
   restore: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>',
+  home: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/>',
+  theme:
+    '<path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.9 1.2-1.8-.5-1.1.2-2.2 1.4-2.2H17a4 4 0 0 0 4-4c0-5.5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15.5" cy="7.5" r="1.2"/>',
 };
 function svg(name) {
   return (
@@ -1175,6 +1223,12 @@ var TX = {
     'Inputs': 'Ingangen',
     'Settings': 'Instellingen',
     'Customise': 'Aanpassen',
+    'Home': 'Start',
+    'Theme': 'Thema',
+    'selected': 'gekozen',
+    'Getting the theme…': 'Thema ophalen…',
+    'Could not change the theme': 'Kan het thema niet wijzigen',
+    'Could not read the themes': 'Kan de thema’s niet lezen',
     'Open': 'Openen',
     'Move left in dock': 'Naar links in dock',
     'Move right in dock': 'Naar rechts in dock',
@@ -1226,6 +1280,12 @@ var TX = {
     'Could not close': 'Konnte nicht geschlossen werden',
     'Could not read the running apps': 'Geöffnete Apps konnten nicht gelesen werden',
     'Inputs': 'Eingänge',
+    'Home': 'Start',
+    'Theme': 'Design',
+    'selected': 'ausgewählt',
+    'Getting the theme…': 'Design wird geladen…',
+    'Could not change the theme': 'Design konnte nicht geändert werden',
+    'Could not read the themes': 'Designs konnten nicht gelesen werden',
     'Settings': 'Einstellungen',
     'Customise': 'Anpassen',
     'Open': 'Öffnen',
@@ -1279,6 +1339,12 @@ var TX = {
     'Could not close': 'Impossible de fermer',
     'Could not read the running apps': 'Impossible de lire les apps ouvertes',
     'Inputs': 'Entrées',
+    'Home': 'Accueil',
+    'Theme': 'Thème',
+    'selected': 'choisi',
+    'Getting the theme…': 'Chargement du thème…',
+    'Could not change the theme': 'Impossible de changer de thème',
+    'Could not read the themes': 'Impossible de lire les thèmes',
     'Settings': 'Paramètres',
     'Customise': 'Personnaliser',
     'Open': 'Ouvrir',
@@ -1332,6 +1398,12 @@ var TX = {
     'Could not close': 'No se pudo cerrar',
     'Could not read the running apps': 'No se pudieron leer las apps abiertas',
     'Inputs': 'Entradas',
+    'Home': 'Inicio',
+    'Theme': 'Tema',
+    'selected': 'elegido',
+    'Getting the theme…': 'Cargando el tema…',
+    'Could not change the theme': 'No se pudo cambiar el tema',
+    'Could not read the themes': 'No se pudieron leer los temas',
     'Settings': 'Ajustes',
     'Customise': 'Personalizar',
     'Open': 'Abrir',
@@ -1385,6 +1457,12 @@ var TX = {
     'Could not close': 'Zatvaranje nije uspjelo',
     'Could not read the running apps': 'Nije moguće pročitati pokrenute aplikacije',
     'Inputs': 'Ulazi',
+    'Home': 'Početak',
+    'Theme': 'Tema',
+    'selected': 'odabrana',
+    'Getting the theme…': 'Učitavanje teme…',
+    'Could not change the theme': 'Promjena teme nije uspjela',
+    'Could not read the themes': 'Teme nije moguće učitati',
     'Settings': 'Postavke',
     'Customise': 'Prilagodi',
     'Open': 'Otvori',
@@ -1731,6 +1809,8 @@ function barLabel(o) {
       ? t('Settings')
       : o.action === 'customize'
         ? t('Customise')
+        : o.action === 'theme' || o.action === 'home'
+          ? t(o.label)
         : o.action === 'live'
           ? t('Live TV')
           : o.label || '';
@@ -1754,6 +1834,8 @@ var apps = [],
   rows = [],
   r = 1,
   c = 0,
+  railEls = [],
+  ri = -1,
   colors = {},
   tiles = {},
   lastSig = '',
@@ -2134,10 +2216,10 @@ function glowSoon(e) {
   }, 110);
 }
 /* ---------- theme: the service resolves the chosen theme (manager > Theme) into CSS variables and a few numbers ---------- */
-var TH0 = { cols: 10, tileH: 151, gapY: 26, gt: 350, viewH: 780, dockN: 4, overlay: false, push: null, overlayH: 510, glow: '' },
+var TH0 = { cols: 10, tileH: 151, gapY: 26, gt: 350, viewH: 780, dockN: 4, rail: false, overlay: false, push: null, overlayH: 510, glow: '' },
   TH = TH0,
   themeKeys = [],
-  themeAttrs = ['data-bar', 'data-labels', 'data-clock', 'data-grid', 'data-galign'];
+  themeAttrs = ['data-bar', 'data-labels', 'data-clock', 'data-grid', 'data-galign', 'data-rail'];
 function applyTheme(t) {
   var st = document.documentElement.style,
     b = document.body,
@@ -2168,6 +2250,7 @@ function applyTheme(t) {
     gt: t.gt || 350,
     viewH: t.viewH || 780,
     dockN: t.dockN || 4,
+    rail: !!t.rail,
     overlay: !!t.overlay,
     push: t.push || null,
     overlayH: t.overlayH || 510,
@@ -2175,9 +2258,32 @@ function applyTheme(t) {
   };
 }
 
+/* the strip on the left: its own column; r and c keep the place in the rows, so Right goes back there */
+function focused() {
+  return ri >= 0 ? railEls[ri] : rows[r][c];
+}
+function railFocus(i) {
+  var old = focused();
+  if (old) old.classList.remove('f');
+  ri = i;
+  var e = railEls[i],
+    n = $('name'),
+    nm = barLabel(e._o);
+  e.classList.add('f');
+  if (n.textContent !== nm) n.textContent = nm;
+}
+function railLeave(nr, nc) {
+  if (ri >= 0) railEls[ri].classList.remove('f');
+  ri = -1;
+  setFocus(nr === undefined ? r : nr, nc === undefined ? c : nc);
+}
 function setFocus(nr, nc, first) {
   var old = rows[r] && rows[r][c];
   if (old) old.classList.remove('f');
+  if (ri >= 0) {
+    railEls[ri].classList.remove('f');
+    ri = -1;
+  }
   r = nr;
   c = Math.min(nc, rows[r].length - 1);
   var e = rows[r][c];
@@ -2309,6 +2415,8 @@ function act(e) {
   }
   var o = e._o || {};
   if (o.action === 'customize') return customizeMenu();
+  if (o.action === 'theme') return themeMenu();
+  if (o.action === 'home') return railLeave(1, 0);
   if (o.action === 'live') return LIVE.enter();
   if (o.action === 'inputs') return inputsMenu();
   if (o.app) launch(o.app, o.params);
@@ -2658,6 +2766,40 @@ function lgHomeMenu() {
     },
   ]);
 }
+/* the Theme button (themes with the strip on the left): the themes of manager > Theme, and Customise, which has no button of its own then */
+function themeMenu() {
+  api('/api/theme/list').then(
+    function (x) {
+      var cur = (x.current && x.current.id) || '',
+        items = (x.themes || []).map(function (th) {
+          return {
+            label: th.name,
+            sub: th.id === cur ? t('selected') : '',
+            fn: function () {
+              if (th.id === cur) return;
+              toast(t('Getting the theme…'));
+              api('/api/theme/set', { id: th.id }).then(
+                function (y) {
+                  if (y.error) toast(t('Could not change the theme'));
+                  else load();
+                },
+                function () {
+                  toast(t('Could not change the theme'));
+                }
+              );
+            },
+          };
+        });
+      items.push({ icon: 'edit', label: t('Customise'), stay: true, fn: customizeMenu });
+      openMenu(t('Theme'), items);
+      for (var i = 0; i < items.length; i++) if (items[i].sub) stack[stack.length - 1].idx = i;
+      drawMenu();
+    },
+    function () {
+      toast(t('Could not read the themes'));
+    }
+  );
+}
 function topButtonsMenu() {
   var items = shownBar().map(function (o) {
     return {
@@ -2748,10 +2890,13 @@ function rebuild() {
   if (oldE) oldE.classList.remove('f');
   var dk = $('dock'),
     gd = $('grid'),
-    bar = $('bar');
+    bar = $('bar'),
+    rl = $('rail');
   dk.textContent = '';
   gd.textContent = '';
   bar.textContent = '';
+  rl.textContent = '';
+  ri = -1;
   var d = dock.map(function (a) {
     var t = tile(a);
     dk.appendChild(t);
@@ -2764,18 +2909,38 @@ function rebuild() {
     fit(t, false);
     return t;
   });
-  var tb = shownBar()
-    .concat([{ label: 'Customise', icon: 'edit', action: 'customize', fixed: true }])
-    .map(function (o) {
-      var p = document.createElement('div');
-      p.className = 'pill';
-      p._o = o;
-      p.innerHTML = svg(o.icon) + '<span></span>';
-      p.lastChild.textContent = barLabel(o);
-      hit(p);
-      bar.appendChild(p);
-      return p;
-    });
+  /* with the strip on the left (theme rail.show) the top bar has only the Theme button; Live TV is among the apps, so it is left off the strip */
+  railEls = TH.rail
+    ? [{ label: 'Home', icon: 'home', action: 'home', fixed: true }]
+        .concat(
+          shownBar().filter(function (o) {
+            return o.action !== 'live';
+          })
+        )
+        .map(function (o) {
+          var b = document.createElement('div');
+          b.className = 'rb';
+          b._o = o;
+          b.innerHTML = svg(o.action === 'inputs' ? 'hdmi' : o.icon);
+          hit(b);
+          rl.appendChild(b);
+          return b;
+        })
+    : [];
+  var tb = (
+    TH.rail
+      ? [{ label: 'Theme', icon: 'theme', action: 'theme', fixed: true }]
+      : shownBar().concat([{ label: 'Customise', icon: 'edit', action: 'customize', fixed: true }])
+  ).map(function (o) {
+    var p = document.createElement('div');
+    p.className = 'pill';
+    p._o = o;
+    p.innerHTML = svg(o.icon) + '<span></span>';
+    p.lastChild.textContent = barLabel(o);
+    hit(p);
+    bar.appendChild(p);
+    return p;
+  });
   rows = [tb, d.length ? d : tb];
   for (var i = 0; i < g.length; i += TH.cols) rows.push(g.slice(i, i + TH.cols));
   var nr = Math.min(r, rows.length - 1),
@@ -2877,9 +3042,12 @@ document.addEventListener('mousemove', function (ev) {
   if (Math.abs(ev.clientX - lastMX) + Math.abs(ev.clientY - lastMY) < 24) return;
   lastMX = ev.clientX;
   lastMY = ev.clientY;
-  var el = ev.target.closest ? ev.target.closest('.tile,.pill') : null,
-    p = el && posOf(el);
-  if (p && !(p[0] === r && p[1] === c)) setFocus(p[0], p[1]);
+  var el = ev.target.closest ? ev.target.closest('.tile,.pill,.rb') : null,
+    p = el && posOf(el),
+    q = el ? railEls.indexOf(el) : -1;
+  if (q >= 0) {
+    if (q !== ri) railFocus(q);
+  } else if (p && (ri >= 0 || !(p[0] === r && p[1] === c))) setFocus(p[0], p[1]);
 });
 
 document.addEventListener('keydown', function (e) {
@@ -2903,6 +3071,15 @@ document.addEventListener('keydown', function (e) {
     if (menuKey(k)) e.preventDefault();
     return;
   }
+  if (ri >= 0 && (k === 461 || k === 27 || k === 8 || k === 39 || k === 38 || k === 40)) {
+    if (k === 38) {
+      if (ri > 0) railFocus(ri - 1);
+    } else if (k === 40) {
+      if (ri < railEls.length - 1) railFocus(ri + 1);
+    } else railLeave();
+    e.preventDefault();
+    return;
+  } /* on the strip: Up and Down move along it, Right and Back go back to the apps */
   if ((TH.overlay || TH.push) && r >= 2 && (k === 461 || k === 27 || k === 8)) {
     setFocus(1, Math.min(c, rows[1].length - 1));
     e.preventDefault();
@@ -2925,7 +3102,9 @@ document.addEventListener('keydown', function (e) {
     }
     lastMove = tn;
   }
-  if (k === 37 && c > 0) setFocus(r, c - 1);
+  if (k === 37 && ri >= 0) return e.preventDefault();
+  else if (k === 37 && c === 0 && railEls.length) railFocus(0);
+  else if (k === 37 && c > 0) setFocus(r, c - 1);
   else if (k === 39 && c < len - 1) setFocus(r, c + 1);
   else if (k === 38 && r > 0) setFocus(r - 1, mapCol(len, rows[r - 1].length, c));
   else if (k === 40 && r < rows.length - 1) setFocus(r + 1, mapCol(len, rows[r + 1].length, c));
@@ -2935,7 +3114,7 @@ document.addEventListener('keydown', function (e) {
       downEnter = true;
       held = false;
       clearTimeout(downT);
-      var t = rows[r][c];
+      var t = focused();
       t.classList.add('press');
       downT = setTimeout(function () {
         held = true;
@@ -2958,7 +3137,7 @@ document.addEventListener('keyup', function (e) {
     downEnter = false;
     return;
   }
-  if (downEnter && !held) act(rows[r][c]);
+  if (downEnter && !held) act(focused());
   downEnter = false;
   held = false;
 });
