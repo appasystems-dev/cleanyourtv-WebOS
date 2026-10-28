@@ -180,11 +180,14 @@ function run(bin, url, extra, budget) {
       const bin = engine(e[1], e[2]);
       for (const p of PAGES) {
         const url = 'http://127.0.0.1:8765/' + p[0] + '.html';
-        // headless Chromium 79 on Linux now and then fails to hand over the page ("Failed to serialize document") or hangs: try again
+        // headless Chromium 79 on Linux now and then fails to hand over the page ("Failed to serialize document") or hangs, and headless
+        // Chromium 68 on Linux now and then hands it over before the page has drawn (its screenshot of the same page is complete): try
+        // again; a page that is really broken fails every time
         let r = null;
         for (let tries = 0; tries < 5; tries++) {
           r = await run(bin, url, ['--dump-dom'], p[4]);
-          if (r.status === 0 && (r.stdout || '').indexOf('<body') >= 0) break;
+          const out = r.stdout || '';
+          if (r.status === 0 && out.indexOf('<body') >= 0 && (out.match(p[2]) || []).length >= p[3]) break;
         }
         const dom = r.stdout || '';
         const errs = (/data-errors="([^"]*)"/.exec(dom) || [])[1] || '';
