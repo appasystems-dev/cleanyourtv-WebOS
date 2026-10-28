@@ -1,5 +1,17 @@
 /* ---------- theme: the service resolves the chosen theme (manager > Theme) into CSS variables and a few numbers ---------- */
-var TH0 = { cols: 10, tileH: 151, gapY: 26, gt: 350, viewH: 780, dockN: 4, rail: false, overlay: false, push: null, overlayH: 510, glow: '' },
+var TH0 = {
+    cols: 10,
+    tileH: 151,
+    gapY: 26,
+    gt: 350,
+    viewH: 780,
+    dockN: 4,
+    rail: false,
+    overlay: false,
+    push: null,
+    overlayH: 510,
+    glow: '',
+  },
   TH = TH0,
   themeKeys = [],
   themeAttrs = ['data-bar', 'data-labels', 'data-clock', 'data-grid', 'data-galign', 'data-rail'];

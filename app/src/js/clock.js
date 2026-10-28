@@ -600,9 +600,9 @@ function barLabel(o) {
         ? t('Customise')
         : o.action === 'theme' || o.action === 'home'
           ? t(o.label)
-        : o.action === 'live'
-          ? t('Live TV')
-          : o.label || '';
+          : o.action === 'live'
+            ? t('Live TV')
+            : o.label || '';
 }
 function clockOpts() {
   var c = cfg.clock,
