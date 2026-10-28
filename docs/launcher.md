@@ -7,7 +7,9 @@ same on every supported webOS version.
 
 ## The screen
 
-- **Dock.** Up to four apps, large, on the first row.
+- **Dock.** The first row, large. Until you change it, it holds the streaming apps on your TV (Netflix, YouTube, Disney+, Max,
+  Prime Video, SkyShowtime, Apple TV, Pickbox, HRTi, RTL Play, MAXtv, Voyo, Plex, in that order), as many as the theme's dock holds
+  (four in Classic, five in Sidebar).
 - **Top shelf.** The name of the focused app and an ambient glow taken from its icon.
 - **Grid.** All other apps, sorted by how often you use each one (or A to Z).
 - **Top buttons.** Inputs, Live TV, Settings and Customise, and a clock. The buttons you see are yours to change.
@@ -58,7 +60,7 @@ A theme can put the buttons in a **strip along the left edge** instead (`rail.sh
 first app, the grid closed), then your top buttons as round icons, without Live TV, which is a tile among the apps. The top bar then
 has only a **Theme** button: it lists the themes, as manager app > Theme does, and **Customise** is its last row.
 
-The dock holds up to four apps. Hold OK on an app and choose **Add to dock**, **Move left**, **Move right** or **Remove from dock**.
+The dock holds four apps, or as many as the theme sets (`dock.count`). Hold OK on an app and choose **Add to dock**, **Move left**, **Move right** or **Remove from dock**.
 
 ## Trailers
 
@@ -108,7 +110,7 @@ Settings are stored on the TV in `/media/developer/cleanyourtv/config.json`:
 
 | Key | Meaning |
 |---|---|
-| `dock` | App ids in the dock (up to four). |
+| `dock` | App ids in the dock (up to the theme's `dock.count`). Missing: the streaming apps on the TV. |
 | `topbar` | The buttons at the top. |
 | `hidden` | App ids you hid. |
 | `sort` | `usage` or `alpha`. |

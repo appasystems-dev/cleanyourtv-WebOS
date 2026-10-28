@@ -9,6 +9,22 @@ var DEFAULTS = {
     { label: 'Settings', icon: 'settings', app: 'com.palm.app.settings' },
   ],
 };
+/* streaming apps by their title, in the order they fill the dock before you change it (Live TV and other apps go to the grid) */
+var STREAMING = [
+  /^netflix/i,
+  /^youtube(?!.*(kids|music))/i,
+  /disney/i,
+  /^(hbo\s*)?max$|hbo/i,
+  /prime video|^amazon/i,
+  /skyshowtime/i,
+  /apple\s*tv/i,
+  /pickbox/i,
+  /^hrti/i,
+  /rtl\s*(play|\+)/i,
+  /maxtv/i,
+  /voyo/i,
+  /^plex/i,
+];
 var PRESETS = [
   { label: 'Inputs', icon: 'inputs', action: 'inputs' },
   { label: 'Settings', icon: 'settings', app: 'com.palm.app.settings' },

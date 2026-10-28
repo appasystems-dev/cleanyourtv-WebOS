@@ -232,6 +232,33 @@ run(async () => {
   press(461);
   ok(ps.ri === -1 && ps.focused() === ps.rows[2][0], 'Back on the strip goes back to the apps');
 
+  // the dock until it is changed: the streaming apps on this TV in a fixed order, as many as the theme holds; the rest go to the grid
+  const dsb = vm.createContext({ cfg: {}, TH: { dockN: 7 }, apps: [] });
+  vm.runInContext(fs.readFileSync(path.join(root, 'app', 'src', 'js', 'core.js'), 'utf8'), dsb);
+  vm.runInContext(fs.readFileSync(path.join(root, 'app', 'src', 'js', 'config.js'), 'utf8'), dsb);
+  dsb.apps = [
+    ['com.webos.app.browser', 'Web Browser'],
+    ['amazon', 'Prime Video'],
+    ['youtube.leanback.kids.v4', 'YouTube Kids'],
+    ['com.hbo.hbomax', 'HBO Max'],
+    ['youtube.leanback.v4', 'YouTube'],
+    ['spotify-beehive', 'Spotify - Music and Podcasts'],
+    ['netflix', 'Netflix'],
+    ['com.disney.disneyplus-prod', 'Disney+'],
+    ['__live', 'Live TV'],
+  ].map(x => ({ id: x[0], title: x[1] }));
+  const auto = JSON.stringify(dsb.dockIds());
+  dsb.cfg = { dock: ['spotify-beehive', 'netflix'] };
+  const mine = JSON.stringify(dsb.dockIds());
+  dsb.cfg = { hidden: ['netflix'] };
+  const hid = JSON.stringify(dsb.dockIds());
+  ok(
+    auto === '["netflix","youtube.leanback.v4","com.disney.disneyplus-prod","com.hbo.hbomax","amazon"]' &&
+      mine === '["spotify-beehive","netflix"]' &&
+      hid === '["youtube.leanback.v4","com.disney.disneyplus-prod","com.hbo.hbomax","amazon"]',
+    'the dock starts with the streaming apps on the TV (Netflix, YouTube, Disney+, Max, Prime Video, ...; not YouTube Kids or Live TV); a dock you set wins, a hidden app is left out'
+  );
+
   // trailers: the focus resting on a dock app asks the service and plays one; moving on or opening anything removes the player
   const tcalls = [],
     tels = {},

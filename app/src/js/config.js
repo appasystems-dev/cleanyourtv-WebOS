@@ -9,12 +9,23 @@ function saveCfg() {
 function isHidden(id) {
   return (cfg.hidden || []).indexOf(id) >= 0;
 }
+/* the dock until you change it: the streaming apps on this TV, in the order of STREAMING, as many as the theme's dock holds */
+function streamingIds() {
+  var out = [];
+  STREAMING.forEach(function (re) {
+    apps.forEach(function (a) {
+      if (a.id !== '__live' && re.test(a.title) && out.indexOf(a.id) < 0) out.push(a.id);
+    });
+  });
+  return out;
+}
 function dockIds() {
   var by = {};
   apps.forEach(function (a) {
     by[a.id] = a;
   });
-  var ids = cfg.dock && cfg.dock.length ? cfg.dock : DEFAULTS.dock;
+  var ids = cfg.dock && cfg.dock.length ? cfg.dock : streamingIds();
+  if (!ids.length) ids = DEFAULTS.dock;
   return ids
     .filter(function (i) {
       return by[i] && !isHidden(i);
