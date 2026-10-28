@@ -93,6 +93,9 @@ Radi se na računalu, a TV služi za konačnu provjeru.
 
 Slike: `docs/screenshots/themes-1.jpg` do `themes-5.jpg`.
 
+Cijeli razgovor o temi Sidebar (odluke, izmjene, problemi na Windowsu): `razgovori/2026-10-25-tema-sidebar.md`.
+Svaki budući razgovor zapisati u `razgovori/` na isti način (samo fork, bez privatnih podataka).
+
 Za Sidebar je launcher dobio novu postavku teme `rail.*` (traka uz lijevi rub) i gumb **Tema**, koji nabraja teme kao manager
 (Tema) i na kraju ima *Prilagodi*, jer u toj temi gore nema drugog gumba. Live TV nije na traci jer je već pločica među aplikacijama.
 Red dolje pokazuje aplikacije iz docka: zadano su samo 4, ostale se dodaju s *Držite OK → Dodaj u traku*.
