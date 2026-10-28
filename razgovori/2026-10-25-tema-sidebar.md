@@ -115,11 +115,17 @@ Korisnik je vidio četiri slike: početni zaslon, dva reda više, fokus na traci
    pozadinu, testove i dokumentaciju, i pokazao slike. Pitao je smije li commitati i pushati.
 3. Korisnik: "pushaj cijeli ovaj razgovor na git". Asistent je commitao i pushao sav posao (`946b0a8`). GitHub Actions je pokrenuo
    *Test build* (paket `test-launcher-lg-home`) i *Documentation*.
-4. Korisnik: ne samo posao, nego i datoteka iz koje se cijeli razgovor može uzeti kao kontekst. Nastala je ova datoteka.
+4. Korisnik: ne samo posao, nego i datoteka iz koje se cijeli razgovor može uzeti kao kontekst. Nastala je ova datoteka (`98d36e6`).
+5. *Test build* za `946b0a8` je pao na `prettier --check` (`app/src/js/clock.js`, `app/src/js/theme.js`). Asistent je te datoteke
+   formatirao Prettierom 3.3.3 (`npx -y prettier@3.3.3 --write <datoteke>`, samo promijenjene datoteke, nakon pretvaranja u LF),
+   ponovno izgradio stranice i pushao (`3667f76`). *Test build* je zatim prošao (testovi pod Node 8.12 i trenutnim Nodeom, stranice),
+   pa je paket `test-launcher-lg-home` spreman.
+
+Pouka: prije pusha pokrenuti Prettier na promijenjenim datotekama. `prettier --check` na cijelom repozitoriju pod Windowsom javlja
+desetke datoteka samo zbog CRLF-a, pa treba provjeravati samo svoje datoteke, i to nakon pretvaranja u LF.
 
 ## 9. Sljedeći koraci
 
-- Provjeriti da je GitHub Actions za `946b0a8` prošao (testovi pod Linuxom, Node 8.12, Chromium 68/79).
 - Na TV-u (kad bude rootan): **CleanYourTV → Update channel → test-launcher-lg-home**, zatim **CleanYourTV → Theme → Sidebar**.
   Isprobati traku, gumb Tema, Prilagodi → LG-ov Home (samo pogledati, ne potvrditi) i dva reda više.
 - Dodati u dock aplikacije koje roditelji koriste (do 7): *Držite OK → Dodaj u traku*.
