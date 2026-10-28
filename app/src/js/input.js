@@ -175,6 +175,7 @@ document.addEventListener('webOSRelaunch', function () {
 });
 document.addEventListener('visibilitychange', function () {
   if (document.hidden) {
+    trailerStop();
     if (LIVE.on) LIVE.exit();
     closeRunningMenu();
   } else load();

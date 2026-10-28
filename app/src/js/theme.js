@@ -59,6 +59,7 @@ function focused() {
 }
 function railFocus(i) {
   var old = focused();
+  trailerStop();
   if (old) old.classList.remove('f');
   ri = i;
   var e = railEls[i],
@@ -87,6 +88,7 @@ function setFocus(nr, nc, first) {
     nm = a ? a.title : e._o ? barLabel(e._o) : '',
     n = $('name');
   if (n.textContent !== nm) n.textContent = nm;
+  trailerFocus(e);
   if (first) glowNow(e);
   else glowSoon(e);
   var sh = 0;

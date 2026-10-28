@@ -94,6 +94,7 @@ Radi se na računalu, a TV služi za konačnu provjeru.
 Slike: `docs/screenshots/themes-1.jpg` do `themes-5.jpg`.
 
 Cijeli razgovor o temi Sidebar (odluke, izmjene, problemi na Windowsu): `razgovori/2026-10-25-tema-sidebar.md`.
+Trejleri iza početnog zaslona (TMDB, tiho, bez dječjeg sadržaja; uključuju se u manageru → Trailers): `razgovori/2026-10-28-trejleri.md`.
 Svaki budući razgovor zapisati u `razgovori/` na isti način (samo fork, bez privatnih podataka).
 
 Za Sidebar je launcher dobio novu postavku teme `rail.*` (traka uz lijevi rub) i gumb **Tema**, koji nabraja teme kao manager

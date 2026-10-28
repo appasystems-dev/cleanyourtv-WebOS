@@ -263,6 +263,7 @@ var napi = null,
   lv = null,
   th = null,
   vo = null,
+  tro = null,
   mdl = [],
   agl = [],
   tst = null,
@@ -849,6 +850,37 @@ function build() {
     });
     return;
   }
+  if (view === 'trailers') {
+    var tr = tro || {},
+      VOLS = [0, 15, 30, 50];
+    rows.push({
+      label: 'Show trailers',
+      sub: tr.hasKey ? onoff(tr.enabled) : 'set the TMDB key first',
+      dim: !tr.hasKey,
+      fn: function () {
+        if (tr.hasKey) trailersSet({ enabled: !tr.enabled }, tr.enabled ? 'Trailers off' : 'Trailers on');
+      },
+    });
+    rows.push({ label: 'TMDB key', sub: (tr.hasKey ? 'saved' : 'not set') + ' · set up from your phone', fn: openTrailerPair });
+    rows.push({
+      label: 'Volume',
+      sub: tr.volume ? tr.volume + ' %' : 'muted',
+      fn: function () {
+        var i = VOLS.indexOf(tr.volume);
+        trailersSet({ volume: VOLS[(i + 1) % VOLS.length] }, '');
+      },
+    });
+    rows.push({
+      label: 'Forget the key',
+      dim: !tr.hasKey,
+      fn: function () {
+        if (tr.hasKey) trailersSet({ clearKey: true }, 'Key removed, trailers off');
+      },
+    });
+    rows.push({ sep: true });
+    rows.push({ label: 'Back', fn: pop });
+    return;
+  }
   if (view === 'livetv') {
     var lo = st.options.liveTv !== false,
       l2 = lv || {},
@@ -1063,6 +1095,7 @@ function build() {
     })(),
     fn: openTheme,
   });
+  rows.push({ label: 'Trailers', sub: tro ? (tro.hasKey ? onoff(tro.enabled) : 'off · needs a TMDB key') : '', fn: openTrailers });
   rows.push({ label: 'Live TV', sub: onoff(st.options.liveTv !== false), fn: openLiveTv });
   rows.push({
     label: 'Input key',
@@ -1307,6 +1340,14 @@ function draw() {
     $('sub').textContent = 'Live TV: your own playlist';
     return;
   }
+  if (view === 'trailers') {
+    $('sub').textContent =
+      'While the focus rests on Netflix, Disney+, Prime Video, Max, SkyShowtime or Apple TV, a trailer of something popular on it plays behind Home.' +
+      (tro && tro.error ? '\nLast error: ' + tro.error : '') +
+      '\nThis product uses the TMDB API but is not endorsed or certified by TMDB.';
+    $('sub').style.whiteSpace = 'pre-line';
+    return;
+  }
   if (view === 'confirm-live-reset') {
     $('sub').textContent = 'Remove the playlist?';
     return;
@@ -1433,6 +1474,85 @@ function openNotifyQr() {
     },
     function () {
       $('sharemsg').textContent = 'The service did not answer.';
+    }
+  );
+}
+function openTrailers() {
+  api('/api/trailers/status').then(
+    function (r) {
+      tro = r;
+      push('trailers');
+    },
+    function () {
+      banner('The service did not answer', 'err');
+    }
+  );
+}
+function trailersSet(b, msg) {
+  api('/api/trailers/set', b).then(
+    function (r) {
+      if (r.error) {
+        banner(r.error, 'err');
+        return;
+      }
+      tro = r;
+      if (msg) banner(msg, 'ok');
+      build();
+      draw();
+    },
+    function () {
+      banner('The service did not answer', 'err');
+    }
+  );
+}
+function openTrailerPair() {
+  shareMode = 'trailers';
+  pairBase = (tro && tro.pairedAt) || 0;
+  push('share');
+  $('share').style.display = 'block';
+  $('shareurl').textContent = '';
+  $('qrbox').style.visibility = 'hidden';
+  $('share').querySelector('h2').textContent = 'TMDB key from your phone';
+  $('share').querySelector('ol').innerHTML =
+    '<li>Phone on the <b>same Wi-Fi</b> as the TV.</li><li>Scan the code with the camera.</li><li>Make a free account at <b>themoviedb.org</b>, paste its <b>API key</b> and tap <b>Save</b>.</li>';
+  $('sharemsg').textContent = 'Preparing…';
+  api('/api/trailers/pair', {}).then(
+    function (r) {
+      if (view !== 'share') return;
+      drawQr(r.url);
+      $('qrbox').style.visibility = 'visible';
+      $('shareurl').textContent = r.url;
+      $('sharemsg').textContent =
+        'The page stays open for ten minutes, or until you save. The key travels over your Wi-Fi, so use a network you trust.';
+      pollTrailerPair(0);
+    },
+    function () {
+      $('sharemsg').textContent = 'The service did not answer.';
+    }
+  );
+}
+function pollTrailerPair(n) {
+  if (view !== 'share' || shareMode !== 'trailers') return;
+  api('/api/trailers/status').then(
+    function (v) {
+      if (v.pairedAt > pairBase) {
+        tro = v;
+        closeShare();
+        banner('Saved: trailers are on', 'ok');
+        return;
+      }
+      if (!v.pairing && n > 1) {
+        $('sharemsg').textContent = 'The page has closed. Close this and try again.';
+        return;
+      }
+      setTimeout(function () {
+        pollTrailerPair(n + 1);
+      }, 2000);
+    },
+    function () {
+      setTimeout(function () {
+        pollTrailerPair(n + 1);
+      }, 3000);
     }
   );
 }
@@ -1797,6 +1917,17 @@ function poll() {
   api('/api/manager/status').then(
     function (s) {
       st = s;
+      if (!tro)
+        api('/api/trailers/status').then(
+          function (x) {
+            tro = x;
+            if (view === 'main') {
+              build();
+              draw();
+            }
+          },
+          function () {}
+        );
       var j = s.job || {};
       if (j.state === 'working') {
         banner(j.message, 'work');
@@ -2274,6 +2405,15 @@ function closeShare() {
   if (shareMode === 'live') {
     pop();
     liveRefresh();
+    return;
+  }
+  if (shareMode === 'trailers') {
+    api('/api/trailers/pair-stop', {}).then(function (r) {
+      tro = r;
+      build();
+      draw();
+    });
+    pop();
     return;
   }
   if (shareMode === 'pair') {

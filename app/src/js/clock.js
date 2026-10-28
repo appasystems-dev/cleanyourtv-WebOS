@@ -671,6 +671,7 @@ function perfMark(m) {
 }
 var perfReady = false;
 function launch(id, params) {
+  trailerStop();
   if (id === '__live') return LIVE.enter();
   api('/api/launch', { id: id, params: params }).then(function (x) {
     if (x && x.returnValue === false) toast(t('Could not open') + ' ' + id);

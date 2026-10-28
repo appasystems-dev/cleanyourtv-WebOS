@@ -60,6 +60,23 @@ has only a **Theme** button: it lists the themes, as manager app > Theme does, a
 
 The dock holds up to four apps. Hold OK on an app and choose **Add to dock**, **Move left**, **Move right** or **Remove from dock**.
 
+## Trailers
+
+Optional, off until you set it up in the manager app (**Trailers**). While the focus rests on Netflix, Disney+, Prime Video, Max,
+SkyShowtime or Apple TV for two and a half seconds, a trailer of something popular on that service in your country plays behind the
+home screen, quietly (the volume is set in the manager: muted, 15, 30 or 50 %). The title shows at the top right. Moving the focus,
+opening an app or a menu, or leaving Home stops it at once, and the player is removed, so the app you open has the TV's video to itself.
+
+The trailers are of films and series for grown-ups: animation, family titles and (for series) kids' programmes are left out. "Popular" is TMDB's
+popularity of the titles that stream on that service in your country, in turn a film and a series; TMDB has no ranking per country.
+
+What is popular, where it streams and which trailer belongs to it come from [TMDB](https://www.themoviedb.org/) with your own free key,
+typed on your phone (manager app > Trailers > TMDB key). The trailers are the official YouTube trailers, played by YouTube's embedded
+player; the language of the trailer follows the TV when one exists, otherwise English. The service asks TMDB at most once every twelve
+hours per service. This product uses the TMDB API but is not endorsed or certified by TMDB.
+
+On an older TV the video can make moving around Home less smooth; switch trailers off or set the volume to muted if it bothers you.
+
 ## Inputs
 
 The **Inputs** button lists HDMI inputs by the names LG shows, with what is connected and a marker on the active one. OK

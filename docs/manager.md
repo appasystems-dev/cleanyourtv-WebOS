@@ -12,6 +12,7 @@
 | Go back to launcher | Appears after a launcher update. |
 | CleanYourTV as Home | Choose LG's Home or ours. The TV restarts. |
 | Theme | Choose a theme (with its screenshot and description) from the list on GitHub; **Theme options** has the accent colour and going back. See [Themes](themes.md). |
+| Trailers | Optional. **Show trailers**, the **TMDB key** (typed on your phone with a QR code), the **Volume** (muted, 15, 30, 50 %) and **Forget the key**. See [Trailers](launcher.md#trailers). |
 | Live TV | **Show Live TV** (off hides it in the launcher and Inputs list and leaves the Guide button to LG), the **Playlist** (set up from your phone with a QR code and a 6-digit code), **Refresh playlist and guide**, **Learn the Guide key**, **Clear recent channels** and **Remove the playlist**. See [Live TV](live-tv.md). |
 | Input key | The takeover switch, **Learn the Input key**, **Input key shows** (the Inputs list over the running app, ready in the background or started when pressed, or the launcher's own list) and the optional **Learn the Home key**. See [The Input key](input-key.md). |
 | Voice | Optional. Installs the speech recogniser (about 80 MB), learns the voice button, tries it, sets where the text goes. See [Voice](voice.md). |

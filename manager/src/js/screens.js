@@ -46,6 +46,85 @@ function openNotifyQr() {
     }
   );
 }
+function openTrailers() {
+  api('/api/trailers/status').then(
+    function (r) {
+      tro = r;
+      push('trailers');
+    },
+    function () {
+      banner('The service did not answer', 'err');
+    }
+  );
+}
+function trailersSet(b, msg) {
+  api('/api/trailers/set', b).then(
+    function (r) {
+      if (r.error) {
+        banner(r.error, 'err');
+        return;
+      }
+      tro = r;
+      if (msg) banner(msg, 'ok');
+      build();
+      draw();
+    },
+    function () {
+      banner('The service did not answer', 'err');
+    }
+  );
+}
+function openTrailerPair() {
+  shareMode = 'trailers';
+  pairBase = (tro && tro.pairedAt) || 0;
+  push('share');
+  $('share').style.display = 'block';
+  $('shareurl').textContent = '';
+  $('qrbox').style.visibility = 'hidden';
+  $('share').querySelector('h2').textContent = 'TMDB key from your phone';
+  $('share').querySelector('ol').innerHTML =
+    '<li>Phone on the <b>same Wi-Fi</b> as the TV.</li><li>Scan the code with the camera.</li><li>Make a free account at <b>themoviedb.org</b>, paste its <b>API key</b> and tap <b>Save</b>.</li>';
+  $('sharemsg').textContent = 'Preparing…';
+  api('/api/trailers/pair', {}).then(
+    function (r) {
+      if (view !== 'share') return;
+      drawQr(r.url);
+      $('qrbox').style.visibility = 'visible';
+      $('shareurl').textContent = r.url;
+      $('sharemsg').textContent =
+        'The page stays open for ten minutes, or until you save. The key travels over your Wi-Fi, so use a network you trust.';
+      pollTrailerPair(0);
+    },
+    function () {
+      $('sharemsg').textContent = 'The service did not answer.';
+    }
+  );
+}
+function pollTrailerPair(n) {
+  if (view !== 'share' || shareMode !== 'trailers') return;
+  api('/api/trailers/status').then(
+    function (v) {
+      if (v.pairedAt > pairBase) {
+        tro = v;
+        closeShare();
+        banner('Saved: trailers are on', 'ok');
+        return;
+      }
+      if (!v.pairing && n > 1) {
+        $('sharemsg').textContent = 'The page has closed. Close this and try again.';
+        return;
+      }
+      setTimeout(function () {
+        pollTrailerPair(n + 1);
+      }, 2000);
+    },
+    function () {
+      setTimeout(function () {
+        pollTrailerPair(n + 1);
+      }, 3000);
+    }
+  );
+}
 function openLiveTv() {
   api('/api/live/status').then(
     function (r) {

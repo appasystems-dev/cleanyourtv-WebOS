@@ -67,6 +67,7 @@ function title(id) {
 /* ---------- actions ---------- */
 function act(e) {
   var a = e._a;
+  trailerStop();
   if (a) {
     if (!a.sys) {
       e.classList.add('launching');

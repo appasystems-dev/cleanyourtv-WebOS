@@ -29,6 +29,17 @@ function poll() {
   api('/api/manager/status').then(
     function (s) {
       st = s;
+      if (!tro)
+        api('/api/trailers/status').then(
+          function (x) {
+            tro = x;
+            if (view === 'main') {
+              build();
+              draw();
+            }
+          },
+          function () {}
+        );
       var j = s.job || {};
       if (j.state === 'working') {
         banner(j.message, 'work');

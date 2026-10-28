@@ -82,6 +82,14 @@ function draw() {
     $('sub').textContent = 'Live TV: your own playlist';
     return;
   }
+  if (view === 'trailers') {
+    $('sub').textContent =
+      'While the focus rests on Netflix, Disney+, Prime Video, Max, SkyShowtime or Apple TV, a trailer of something popular on it plays behind Home.' +
+      (tro && tro.error ? '\nLast error: ' + tro.error : '') +
+      '\nThis product uses the TMDB API but is not endorsed or certified by TMDB.';
+    $('sub').style.whiteSpace = 'pre-line';
+    return;
+  }
   if (view === 'confirm-live-reset') {
     $('sub').textContent = 'Remove the playlist?';
     return;

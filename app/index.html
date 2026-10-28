@@ -119,6 +119,66 @@ body {
   opacity: var(--glow-op);
 }
 
+/* a trailer behind the home screen (manager > Trailers): the picture first, the video over it once it plays; darkened towards the
+   bottom and the left so the apps stay readable */
+#trl {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity calc(0.8s * var(--spd)) ease;
+  will-change: opacity;
+}
+#trl.on {
+  opacity: 1;
+}
+#trl-bd,
+#trl iframe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  border: 0;
+  background-size: cover;
+  background-position: center;
+}
+#trl iframe {
+  opacity: 0;
+  transition: opacity calc(0.8s * var(--spd)) ease;
+}
+#trl iframe.on {
+  opacity: 1;
+}
+#trl::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  background: linear-gradient(to top, rgba(var(--night-rgb), 0.9), rgba(var(--night-rgb), 0) 50%),
+    linear-gradient(to right, rgba(var(--night-rgb), 0.55), rgba(var(--night-rgb), 0) 35%);
+}
+#trl-cap {
+  position: absolute;
+  right: 96px;
+  top: 140px;
+  z-index: 1;
+  max-width: 900px;
+  font-size: calc(30px * var(--fs));
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+}
+
 #top {
   position: absolute;
   left: 0;
@@ -1168,6 +1228,7 @@ svg.st {
 }
 </style></head><body>
 <div class="glow" id="gA"></div><div class="glow" id="gB"></div>
+<div id="trl"><div id="trl-bd"></div><div id="trl-cap"></div></div>
 <div id="top"><div id="clock"><div id="time"></div><div id="date"></div></div><div id="bar"></div><div id="rail"></div></div>
 <div id="shelf"><div id="name"></div></div>
 <div id="view"><div id="scroll"><div id="dock"></div><div id="grid"></div></div></div>
@@ -1882,6 +1943,7 @@ function perfMark(m) {
 }
 var perfReady = false;
 function launch(id, params) {
+  trailerStop();
   if (id === '__live') return LIVE.enter();
   api('/api/launch', { id: id, params: params }).then(function (x) {
     if (x && x.returnValue === false) toast(t('Could not open') + ' ' + id);
@@ -2276,6 +2338,7 @@ function focused() {
 }
 function railFocus(i) {
   var old = focused();
+  trailerStop();
   if (old) old.classList.remove('f');
   ri = i;
   var e = railEls[i],
@@ -2304,6 +2367,7 @@ function setFocus(nr, nc, first) {
     nm = a ? a.title : e._o ? barLabel(e._o) : '',
     n = $('name');
   if (n.textContent !== nm) n.textContent = nm;
+  trailerFocus(e);
   if (first) glowNow(e);
   else glowSoon(e);
   var sh = 0;
@@ -2416,6 +2480,7 @@ function title(id) {
 /* ---------- actions ---------- */
 function act(e) {
   var a = e._a;
+  trailerStop();
   if (a) {
     if (!a.sys) {
       e.classList.add('launching');
@@ -2453,6 +2518,7 @@ function setHtml(el, h) {
   return n;
 }
 function openMenu(title, items) {
+  trailerStop();
   stack.push({ title: title, items: items, idx: 0 });
   drawMenu();
 }
@@ -3005,6 +3071,82 @@ function load() {
       setTimeout(load, 3000);
     });
 }
+/* ---------- trailers (manager > Trailers): while the focus rests on a streaming app, a trailer of something popular on it plays
+   quietly behind the home screen. The service finds them (TMDB) and serves the player page; this only shows and removes it. The player
+   is removed, not paused, whenever the focus moves or anything opens, so the TV's video pipeline is free for the app. ---------- */
+var TRL_WAIT = 2500,
+  TRL_AGE = 6 * 3600 * 1000,
+  trlT = 0,
+  trlFor = '',
+  trlFrame = null,
+  trlCache = {},
+  trlTurn = {};
+function trailersOn() {
+  return !!(cfg.trailers && cfg.trailers.enabled);
+}
+function trlRegion() {
+  var m = /^[a-z]{2}-([A-Z]{2})/.exec(LOC);
+  return m ? m[1] : '';
+}
+/* called on every focus change: a tile of the dock row (or of a grid that stays in view) waits, then plays */
+function trailerFocus(e) {
+  var a = e && e._a,
+    id = a && !a.sys && trailersOn() && (r === 1 || (!TH.push && !TH.overlay)) ? a.id : '';
+  if (id && id === trlFor) return;
+  trailerStop();
+  if (!id) return;
+  trlFor = id;
+  trlT = setTimeout(function () {
+    trailerLoad(a);
+  }, TRL_WAIT);
+}
+function trailerLoad(a) {
+  var c = trlCache[a.id];
+  if (c && Date.now() - c.at < TRL_AGE) return trailerPlay(a, c.items);
+  api('/api/trailers/for?title=' + encodeURIComponent(a.title) + '&region=' + trlRegion() + '&lang=' + encodeURIComponent(LOC)).then(
+    function (x) {
+      var items = (x && x.items) || [];
+      if (!(x && x.error)) trlCache[a.id] = { at: Date.now(), items: items };
+      trailerPlay(a, items);
+    },
+    function () {}
+  );
+}
+function trailerPlay(a, items) {
+  if (trlFor !== a.id || !items.length) return;
+  var n = trlTurn[a.id] || 0,
+    it = items[n % items.length],
+    w = $('trl');
+  trlTurn[a.id] = n + 1;
+  $('trl-bd').style.backgroundImage = it.backdrop ? 'url("' + it.backdrop + '")' : 'none';
+  $('trl-cap').textContent = it.title + (it.year ? ' (' + it.year + ')' : '');
+  w.classList.add('on');
+  trlFrame = document.createElement('iframe');
+  trlFrame.setAttribute('allow', 'autoplay');
+  trlFrame.src = API + '/api/trailers/player?v=' + encodeURIComponent(it.video) + '&vol=' + ((cfg.trailers && cfg.trailers.volume) || 0);
+  w.appendChild(trlFrame);
+}
+function trailerStop() {
+  clearTimeout(trlT);
+  trlFor = '';
+  if (trlFrame) {
+    trlFrame.src = 'about:blank';
+    if (trlFrame.parentNode) trlFrame.parentNode.removeChild(trlFrame);
+    trlFrame = null;
+  }
+  var w = $('trl');
+  if (w) w.classList.remove('on');
+}
+window.addEventListener('message', function (ev) {
+  if (!trlFrame || ev.source !== trlFrame.contentWindow) return;
+  if (ev.data === 'cytv-trailer:playing') trlFrame.classList.add('on');
+  else if (ev.data === 'cytv-trailer:error') {
+    /* the picture stays, without the video */
+    trlFrame.src = 'about:blank';
+    trlFrame.parentNode.removeChild(trlFrame);
+    trlFrame = null;
+  }
+});
 /* ---------- input: tap OK to open, hold OK for options ---------- */
 var lastMove = 0,
   snapT = 0,
@@ -3182,6 +3324,7 @@ document.addEventListener('webOSRelaunch', function () {
 });
 document.addEventListener('visibilitychange', function () {
   if (document.hidden) {
+    trailerStop();
     if (LIVE.on) LIVE.exit();
     closeRunningMenu();
   } else load();

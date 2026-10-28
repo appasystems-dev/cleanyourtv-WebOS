@@ -18,6 +18,7 @@ function setHtml(el, h) {
   return n;
 }
 function openMenu(title, items) {
+  trailerStop();
   stack.push({ title: title, items: items, idx: 0 });
   drawMenu();
 }

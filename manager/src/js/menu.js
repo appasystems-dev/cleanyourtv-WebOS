@@ -502,6 +502,37 @@ function build() {
     });
     return;
   }
+  if (view === 'trailers') {
+    var tr = tro || {},
+      VOLS = [0, 15, 30, 50];
+    rows.push({
+      label: 'Show trailers',
+      sub: tr.hasKey ? onoff(tr.enabled) : 'set the TMDB key first',
+      dim: !tr.hasKey,
+      fn: function () {
+        if (tr.hasKey) trailersSet({ enabled: !tr.enabled }, tr.enabled ? 'Trailers off' : 'Trailers on');
+      },
+    });
+    rows.push({ label: 'TMDB key', sub: (tr.hasKey ? 'saved' : 'not set') + ' · set up from your phone', fn: openTrailerPair });
+    rows.push({
+      label: 'Volume',
+      sub: tr.volume ? tr.volume + ' %' : 'muted',
+      fn: function () {
+        var i = VOLS.indexOf(tr.volume);
+        trailersSet({ volume: VOLS[(i + 1) % VOLS.length] }, '');
+      },
+    });
+    rows.push({
+      label: 'Forget the key',
+      dim: !tr.hasKey,
+      fn: function () {
+        if (tr.hasKey) trailersSet({ clearKey: true }, 'Key removed, trailers off');
+      },
+    });
+    rows.push({ sep: true });
+    rows.push({ label: 'Back', fn: pop });
+    return;
+  }
   if (view === 'livetv') {
     var lo = st.options.liveTv !== false,
       l2 = lv || {},
@@ -716,6 +747,7 @@ function build() {
     })(),
     fn: openTheme,
   });
+  rows.push({ label: 'Trailers', sub: tro ? (tro.hasKey ? onoff(tro.enabled) : 'off · needs a TMDB key') : '', fn: openTrailers });
   rows.push({ label: 'Live TV', sub: onoff(st.options.liveTv !== false), fn: openLiveTv });
   rows.push({
     label: 'Input key',

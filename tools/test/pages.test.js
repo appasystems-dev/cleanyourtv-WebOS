@@ -194,6 +194,8 @@ run(async () => {
     t: k => k,
     glowNow() {},
     glowSoon() {},
+    trailerFocus() {},
+    trailerStop() {},
     TH: { push: null, overlay: false, rail: true, tileH: 150, gapY: 60, gt: 350, viewH: 780 },
     r: 1,
     c: 0,
@@ -229,4 +231,58 @@ run(async () => {
   press(37);
   press(461);
   ok(ps.ri === -1 && ps.focused() === ps.rows[2][0], 'Back on the strip goes back to the apps');
+
+  // trailers: the focus resting on a dock app asks the service and plays one; moving on or opening anything removes the player
+  const tcalls = [],
+    tels = {},
+    box = () => {
+      const e = el();
+      e.children = [];
+      e.appendChild = c => (e.children.push(c), (c.parentNode = e));
+      e.removeChild = c => e.children.splice(e.children.indexOf(c), 1);
+      return e;
+    };
+  const tsb = vm.createContext({
+    window: { addEventListener() {} },
+    document: { createElement: () => Object.assign(el(), { setAttribute() {}, contentWindow: {} }) },
+    setTimeout,
+    clearTimeout,
+    Date,
+    API: 'http://127.0.0.1:8765',
+    LOC: 'hr-HR',
+    cfg: { trailers: { enabled: true, volume: 15 } },
+    TH: { push: { up: 400 }, overlay: false },
+    r: 1,
+    $: id => tels[id] || (tels[id] = box()),
+    api: p => (tcalls.push(p), Promise.resolve({ items: [{ title: 'Film A', year: '2025', video: 'trail_hr_10', backdrop: '' }] })),
+  });
+  vm.runInContext(fs.readFileSync(path.join(root, 'app', 'src', 'js', 'trailers.js'), 'utf8'), tsb);
+  vm.runInContext('TRL_WAIT = 20', tsb);
+  const nfx = { _a: { id: 'netflix', title: 'Netflix' } };
+  tsb.trailerFocus(nfx);
+  await new Promise(res => setTimeout(res, 60));
+  const frame = tels.trl.children[0];
+  ok(
+    tcalls.length === 1 &&
+      tcalls[0] === '/api/trailers/for?title=Netflix&region=HR&lang=hr-HR' &&
+      !!frame &&
+      frame.src === 'http://127.0.0.1:8765/api/trailers/player?v=trail_hr_10&vol=15' &&
+      tels.trl.classList.contains('on') &&
+      tels['trl-cap'].textContent === 'Film A (2025)',
+    'resting on Netflix asks for its trailers with the TV country and language and plays one quietly behind Home'
+  );
+  tsb.trailerStop();
+  ok(tels.trl.children.length === 0 && frame.src === 'about:blank' && !tels.trl.classList.contains('on'), 'stopping removes the player');
+  tsb.r = 2;
+  tsb.trailerFocus({ _a: { id: 'other', title: 'Disney+' } });
+  tsb.r = 1;
+  tsb.trailerFocus({ _a: { id: 'netflix', title: 'Netflix' } });
+  tsb.trailerFocus({ _o: { label: 'Theme' } });
+  tsb.cfg.trailers.enabled = false;
+  tsb.trailerFocus(nfx);
+  await new Promise(res => setTimeout(res, 60));
+  ok(
+    tcalls.length === 1 && tels.trl.children.length === 0,
+    'nothing plays from an opened grid, when the focus moves on before the wait, or when trailers are off'
+  );
 });

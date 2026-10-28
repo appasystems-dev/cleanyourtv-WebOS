@@ -114,6 +114,66 @@ body {
   opacity: var(--glow-op);
 }
 
+/* a trailer behind the home screen (manager > Trailers): the picture first, the video over it once it plays; darkened towards the
+   bottom and the left so the apps stay readable */
+#trl {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity calc(0.8s * var(--spd)) ease;
+  will-change: opacity;
+}
+#trl.on {
+  opacity: 1;
+}
+#trl-bd,
+#trl iframe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  border: 0;
+  background-size: cover;
+  background-position: center;
+}
+#trl iframe {
+  opacity: 0;
+  transition: opacity calc(0.8s * var(--spd)) ease;
+}
+#trl iframe.on {
+  opacity: 1;
+}
+#trl::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  background: linear-gradient(to top, rgba(var(--night-rgb), 0.9), rgba(var(--night-rgb), 0) 50%),
+    linear-gradient(to right, rgba(var(--night-rgb), 0.55), rgba(var(--night-rgb), 0) 35%);
+}
+#trl-cap {
+  position: absolute;
+  right: 96px;
+  top: 140px;
+  z-index: 1;
+  max-width: 900px;
+  font-size: calc(30px * var(--fs));
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+}
+
 #top {
   position: absolute;
   left: 0;

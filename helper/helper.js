@@ -60,6 +60,7 @@ if (notify) load('notifyapi', () => require('./notifyapi').create(ctx));
 const manager = load('manager', () => require('./manager').create(ctx));
 load('apps', () => require('./apps').create(ctx));
 load('running', () => require('./running').create(ctx));
+load('trailers', () => require('./trailers').create(ctx));
 
 require('./server')
   .create({ features: () => loaded })

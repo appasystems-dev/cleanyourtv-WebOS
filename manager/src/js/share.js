@@ -63,6 +63,15 @@ function closeShare() {
     liveRefresh();
     return;
   }
+  if (shareMode === 'trailers') {
+    api('/api/trailers/pair-stop', {}).then(function (r) {
+      tro = r;
+      build();
+      draw();
+    });
+    pop();
+    return;
+  }
   if (shareMode === 'pair') {
     api('/api/voice/pair-stop', {}).catch(function () {});
     pop();

@@ -127,12 +127,13 @@ function create(ctx) {
     });
   }
 
-  // what the launcher gets: its settings and the resolved theme, not the secrets (voice, notification token)
+  // what the launcher gets: its settings and the resolved theme, not the secrets (voice, notification token, TMDB key)
   function launcherConfig() {
     const c = config.get();
     delete c.voice;
     delete c.notifyApi;
     delete c.theme;
+    if (c.trailers) c.trailers = { enabled: !!c.trailers.enabled && !!c.trailers.key, volume: Number(c.trailers.volume) || 0 };
     const theme = ctx.feature('theme');
     return theme ? Object.assign(c, { theme: theme.resolved() }) : c;
   }

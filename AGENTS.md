@@ -26,6 +26,7 @@ disk, and a reboot without the boot scripts brings LG's Home back.
 | Live TV: playlist, guide, favourites | `helper/live.js` and `app/src/js/live.js` |
 | Picture notifications | `notify/app/`, `helper/notify.js`, `helper/notifyapi.js` |
 | Voice (Moonshine, OpenRouter, Home Assistant) | `helper/voice.js` (microphone, recogniser), `helper/answers.js` (Assist, OpenRouter, your server), `voice/` |
+| Trailers behind Home (TMDB, YouTube player) | `helper/trailers.js` and `app/src/js/trailers.js` |
 | Themes | `helper/themeschema.js` (the schema), `helper/theme.js` (downloads), `themes/` (read from GitHub), `docs/themes.md` |
 | The report people attach to issues | `helper/sharelog.js` (`node sharelog.js --print` prints it) |
 | Node 8 compatibility helpers, diagnostics | `helper/netcompat.js`, `helper/diag.js` |
@@ -41,7 +42,7 @@ disk, and a reboot without the boot scripts brings LG's Home back.
   `/tmp/cleanyourtv-helper.log` (service log), `/tmp/lginput-hook-lginput2.log` (input hook).
 - Root SSH works with a key (`ssh root@<tv-ip>`). `luna-send` must have stdin redirected: `luna-send -n 1 -w 5000 -f <uri> '<json>' </dev/null`.
 - The service listens on `127.0.0.1:8765` (use `curl` on the TV). Other ports: 8766 Live TV pairing, 8767 network notifications (opt-in),
-  8768+ share log, 8769 voice setup. The last four are short-lived or off by default.
+  8768+ share log, 8769 voice setup, 8791 trailers key setup. The last five are short-lived or off by default.
 - Going back to LG's Home: manager app > CleanYourTV as Home off, or `sh /media/developer/cleanyourtv/undo-home.sh`. If a boot crashes,
   the Homebrew Channel's failsafe mode skips the boot scripts.
 - A TV's own state can be the problem: a stuck media pipeline (black video, no sound) is cleared by a reboot; check
