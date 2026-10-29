@@ -27,6 +27,7 @@
 | `manager.js`, `updates.js`, `debloat.js` | The manager's API, updates from GitHub releases with rollback, switching the debloat. |
 | `live.js`, `notify.js`, `notifyapi.js` | One feature each. |
 | `theme.js`, `themeschema.js` | Themes: `themeschema.js` holds every setting a theme can make, the checks and how a theme becomes CSS variables; `theme.js` reads themes from GitHub and keeps them on the TV. |
+| `radio.js`, `ambient.js`, `photos.js` | The Radio button's stations (Radio Browser); the Mode button's pictures of the day and switching the screen off; your photos sent from a phone. |
 | `trailers.js` | Optional trailers on the home screen: popular titles per streaming service and their trailers from TMDB, the YouTube player page the launcher shows, the phone page for the key. |
 | `voice.js`, `answers.js` | Voice: the microphone, the recogniser, the phone setup page; `answers.js` asks Home Assistant, a language model or your server. |
 | `selfupdate.js`, `sharelog.js` | Programs the manager runs when the service is not running. |

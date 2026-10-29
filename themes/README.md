@@ -55,7 +55,7 @@ Folder: [`horizon/`](horizon/)
 
 ### Sidebar
 
-A strip on the left with Home, Inputs and Settings, only a Theme button at the top right, and one row of apps at the bottom. Down shows two more rows with the other apps.
+A strip on the left with Home, Antenna TV, Radio, Inputs, Settings and Theme, a Mode button at the top right, five large apps at the bottom.
 
 [![Sidebar](sidebar/preview.jpg)](sidebar/preview.jpg)
 

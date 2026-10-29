@@ -60,6 +60,9 @@ function create(ctx) {
     return JSON.parse(r.body.toString('utf8'));
   }
 
+  // a description cut at a word, for the two or three lines under the title
+  const shorten = (s, n) => (s.length <= n ? s : s.slice(0, s.lastIndexOf(' ', n - 1) > n / 2 ? s.lastIndexOf(' ', n - 1) : n - 1) + '…');
+
   // the trailer to show for a title: an official YouTube trailer in the TV's language, else in English, else a teaser
   function bestVideo(list, lang) {
     const yt = (list || []).filter(v => v && v.site === 'YouTube' && VIDEO.test(String(v.key)));
@@ -104,6 +107,7 @@ function create(ctx) {
               ? {
                   title: String(x.r.title || x.r.name || '').slice(0, 120),
                   year: /^\d{4}/.test(d) ? d.slice(0, 4) : '',
+                  overview: shorten(String(x.r.overview || ''), 240),
                   kind: x.kind,
                   video,
                   backdrop: /^\/[\w.-]+$/.test(String(x.r.backdrop_path || '')) ? IMG + x.r.backdrop_path : '',

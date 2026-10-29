@@ -110,6 +110,18 @@ function create(ctx) {
     if (strs(b.hidden)) out.hidden = strs(b.hidden);
     if (b.sort === 'usage' || b.sort === 'alpha') out.sort = b.sort;
     if (['auto', '24', '12'].includes(b.clock)) out.clock = b.clock;
+    // names given to inputs on the TV (HDMI 3 -> PS5), by the input's app id
+    if (b.inputNames && typeof b.inputNames === 'object' && !Array.isArray(b.inputNames)) {
+      const n = {};
+      for (const k of Object.keys(b.inputNames).slice(0, 16)) {
+        const v = String(b.inputNames[k] || '')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .slice(0, 30);
+        if (/^[\w.-]{1,80}$/.test(k) && v) n[k] = v;
+      }
+      out.inputNames = n;
+    }
     if (Array.isArray(b.topbar))
       out.topbar = b.topbar
         .slice(0, 12)
@@ -141,7 +153,14 @@ function create(ctx) {
   async function handle(req, res, u, body) {
     if (u === '/api/apps')
       return web.json(res, { apps: await apps(), config: launcherConfig(), usage: usageScores(), version: ctx.version });
-    if (u === '/api/inputs') return web.json(res, await luna('luna://com.webos.service.eim/getAllInputStatus', {}));
+    if (u === '/api/inputs') {
+      // a name given on the TV replaces LG's; LG's own stays in lgLabel
+      const r = await luna('luna://com.webos.service.eim/getAllInputStatus', {}),
+        names = config.get().inputNames || {};
+      if (Array.isArray(r.devices))
+        r.devices = r.devices.map(d => (d && names[d.appId] ? Object.assign({}, d, { label: names[d.appId], lgLabel: d.label }) : d));
+      return web.json(res, r);
+    }
     if (u === '/api/foreground') return web.json(res, await luna('luna://com.webos.applicationManager/getForegroundAppInfo', {}));
     if (u === '/api/launch' && req.method === 'POST') {
       const b = await body(req);

@@ -161,22 +161,246 @@ body {
   top: 0;
   width: 1920px;
   height: 1080px;
-  background: linear-gradient(to top, rgba(var(--night-rgb), 0.9), rgba(var(--night-rgb), 0) 50%),
-    linear-gradient(to right, rgba(var(--night-rgb), 0.55), rgba(var(--night-rgb), 0) 35%);
+  background: linear-gradient(to top, rgba(var(--night-rgb), 0.92), rgba(var(--night-rgb), 0) 45%),
+    linear-gradient(to right, rgba(var(--night-rgb), 0.85), rgba(var(--night-rgb), 0.35) 40%, rgba(var(--night-rgb), 0) 65%);
 }
-#trl-cap {
+/* the title and its description take the place of the app name: from the grid's left edge, at the name's height (shelf.y) */
+#trl-txt {
   position: absolute;
-  right: 96px;
-  top: 140px;
+  left: var(--grid-l);
+  top: var(--name-y);
   z-index: 1;
-  max-width: 900px;
-  font-size: calc(30px * var(--fs));
-  font-weight: 600;
-  text-align: right;
+  width: 860px;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
+}
+#trl-t {
+  font-size: calc(68px * var(--fs));
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+#trl-o {
+  margin-top: 20px;
+  font-size: calc(28px * var(--fs));
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.86);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+#shelf {
+  transition: opacity calc(0.3s * var(--spd)) ease;
+}
+.hero #shelf {
+  opacity: 0;
+}
+/* an app without films (YouTube): its logo, large, in the middle above the apps */
+#trl-logo {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 200px;
+  width: 340px;
+  height: 340px;
+  margin-left: -170px;
+  z-index: 1;
+  border-radius: 48px;
+  object-fit: contain;
+}
+#trl.logo #trl-logo {
+  display: block;
+}
+#trl.logo #trl-txt {
+  display: none;
+}
+
+/* the Mode screens: above everything, any key ends them */
+#mode {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  z-index: 80;
+  background: #000;
+  overflow: hidden;
+}
+#mode .mph {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity calc(2s * var(--spd)) ease;
+}
+#mode .mph.on {
+  opacity: 1;
+}
+/* your own photos: whole, on black; a photo the phone held upright is turned (older TV browsers ignore the EXIF orientation) */
+#mode.mine .mph {
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+#mode.mine .mph.side {
+  left: 420px;
+  top: -420px;
+  width: 1080px;
+  height: 1920px;
+}
+/* the evening light: a warm base, three soft lights drifting, and a dark layer whose opacity sets how much light the room gets */
+#mode .lb0,
+#mode .ldim {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+}
+#mode .ldim {
+  background: #000;
+  transition: opacity calc(0.6s * var(--spd)) ease;
+}
+#mode.light .blob {
+  opacity: 0.85;
+}
+#mode .lhint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 60px;
+  text-align: center;
+  font-size: 26px;
+  color: rgba(255, 255, 255, 0.75);
+  transition: opacity calc(1s * var(--spd)) ease;
+}
+#mode .lhint.gone {
+  opacity: 0;
+}
+#mode .mclk.small .mt {
+  font-size: 64px;
+  color: rgba(255, 255, 255, 0.4);
+}
+#mode .mclk.small .md {
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.3);
+}
+#mode .mcap {
+  position: absolute;
+  left: 60px;
+  bottom: 36px;
+  max-width: 1500px;
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.7);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+}
+#mode .mclk {
+  position: absolute;
+  left: 200px;
+  top: 200px;
+  transition: transform calc(3s * var(--spd)) ease;
+}
+#mode .mt {
+  font-size: 150px;
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.82);
+}
+#mode .md {
+  margin-top: 12px;
+  font-size: 40px;
+  color: rgba(255, 255, 255, 0.55);
+}
+#mode .blob {
+  position: absolute;
+  width: 1100px;
+  height: 1100px;
+  border-radius: 50%;
+  opacity: 0.55;
+  will-change: transform;
+}
+#mode .b1 {
+  left: -200px;
+  top: -300px;
+  background: radial-gradient(closest-side, rgba(40, 90, 160, 0.9), rgba(40, 90, 160, 0));
+  animation: drift1 calc(60s / var(--spd)) ease-in-out infinite alternate;
+}
+#mode .b2 {
+  left: 900px;
+  top: 200px;
+  background: radial-gradient(closest-side, rgba(150, 60, 120, 0.8), rgba(150, 60, 120, 0));
+  animation: drift2 calc(75s / var(--spd)) ease-in-out infinite alternate;
+}
+#mode .b3 {
+  left: 300px;
+  top: 500px;
+  background: radial-gradient(closest-side, rgba(30, 140, 120, 0.7), rgba(30, 140, 120, 0));
+  animation: drift1 calc(90s / var(--spd)) ease-in-out infinite alternate-reverse;
+}
+@keyframes drift1 {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(500px, 250px) scale(1.25);
+  }
+}
+@keyframes drift2 {
+  from {
+    transform: translate(0, 0) scale(1.1);
+  }
+  to {
+    transform: translate(-600px, -200px) scale(0.9);
+  }
+}
+
+/* naming an input: the TV's keyboard comes up for the field */
+#ren {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  z-index: 70;
+  background: var(--menu-bg);
+}
+#ren .panel {
+  position: absolute;
+  left: 560px;
+  top: 220px;
+  width: 800px;
+}
+#ren h2 {
+  margin: 0 0 30px;
+  font-size: calc(44px * var(--fs));
+}
+#ren input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 22px 28px;
+  font: inherit;
+  font-size: calc(40px * var(--fs));
+  color: var(--ink);
+  background: var(--panel2);
+  border: 3px solid var(--focus);
+  border-radius: var(--row-r);
+  outline: none;
+}
+#ren p {
+  margin-top: 24px;
+  font-size: calc(24px * var(--fs));
+  color: var(--ink2);
 }
 
 #top {
@@ -1228,7 +1452,7 @@ svg.st {
 }
 </style></head><body>
 <div class="glow" id="gA"></div><div class="glow" id="gB"></div>
-<div id="trl"><div id="trl-bd"></div><div id="trl-cap"></div></div>
+<div id="trl"><div id="trl-bd"></div><img id="trl-logo" alt=""><div id="trl-txt"><div id="trl-t"></div><div id="trl-o"></div></div></div>
 <div id="top"><div id="clock"><div id="time"></div><div id="date"></div></div><div id="bar"></div><div id="rail"></div></div>
 <div id="shelf"><div id="name"></div></div>
 <div id="view"><div id="scroll"><div id="dock"></div><div id="grid"></div></div></div>
@@ -1262,6 +1486,8 @@ var STREAMING = [
   /voyo/i,
   /^plex/i,
 ];
+/* the themes the Theme button offers on this TV (the others stay in the manager app); LG's own Home is always the last choice */
+var MENU_THEMES = ['sidebar'];
 var PRESETS = [
   { label: 'Inputs', icon: 'inputs', action: 'inputs' },
   { label: 'Settings', icon: 'settings', app: 'com.palm.app.settings' },
@@ -1276,6 +1502,11 @@ var ICONS = {
   hdmi: '<path d="M4 8h16v7l-3 3H7l-3-3z"/><path d="M9 11v3M12 11v3M15 11v3"/>',
   restore: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>',
   home: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/>',
+  radio:
+    '<rect x="3" y="9" width="18" height="12" rx="2"/><path d="M7 5l11 4"/><circle cx="15.5" cy="15" r="2.6"/><path d="M6.5 13h4M6.5 17h4"/>',
+  mode: '<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.6 6.6 0 0 0 10.5 10.5z"/>',
+  antenna:
+    '<circle cx="12" cy="9" r="1.6"/><path d="M12 11v10M8 21h8"/><path d="M8.6 5.6a4.8 4.8 0 0 0 0 6.8M15.4 5.6a4.8 4.8 0 0 1 0 6.8"/><path d="M5.7 2.7a8.9 8.9 0 0 0 0 12.6M18.3 2.7a8.9 8.9 0 0 1 0 12.6"/>',
   theme:
     '<path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.9 1.2-1.8-.5-1.1.2-2.2 1.4-2.2H17a4 4 0 0 0 4-4c0-5.5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15.5" cy="7.5" r="1.2"/>',
 };
@@ -1301,6 +1532,43 @@ var TX = {
     'Settings': 'Instellingen',
     'Customise': 'Aanpassen',
     'Home': 'Start',
+    'Antenna TV': 'Antenne-tv',
+    'Evening light': 'Avondlicht',
+    'lights the room softly': 'verlicht de kamer zacht',
+    'My photos': 'Mijn foto’s',
+    'photos': 'foto’s',
+    'none yet: send some from your phone': 'nog geen: stuur ze vanaf je telefoon',
+    'Add photos...': 'Foto’s toevoegen...',
+    'Photos of the day': 'Foto’s van de dag',
+    'Delete my photos': 'Mijn foto’s verwijderen',
+    'Your photos are deleted': 'Je foto’s zijn verwijderd',
+    'Up and Down: brighter or darker · Left and Right: colour · other keys: back':
+      'Omhoog en omlaag: lichter of donkerder · links en rechts: kleur · andere toetsen: terug',
+    'No photos now: the evening light instead': 'Nu geen foto’s: het avondlicht in de plaats',
+    'The photo page could not be opened': 'De fotopagina kon niet open',
+    'type it in the phone’s browser (same Wi-Fi)': 'typ het in de browser van de telefoon (zelfde wifi)',
+    'Done': 'Klaar',
+    'photos received': 'foto’s ontvangen',
+    'Radio': 'Radio',
+    'Mode': 'Modus',
+    'No': 'Nee',
+    'hold OK for 5 seconds': 'houd OK 5 seconden ingedrukt',
+    'keep holding OK': 'OK ingedrukt houden',
+    'LG’s own Home': 'LG’s eigen Home',
+    'Rename inputs...': 'Ingangen hernoemen...',
+    'Name for': 'Naam voor',
+    'OK saves · Back cancels · empty brings back LG’s name': 'OK bewaart · Terug annuleert · leeg geeft LG’s naam terug',
+    'Saved': 'Bewaard',
+    'LG’s name is back': 'LG’s naam is terug',
+    'This station does not play now': 'Deze zender speelt nu niet',
+    'No radio stations found': 'Geen radiozenders gevonden',
+    'Stop the radio': 'Radio stoppen',
+    'playing': 'speelt',
+    'Black screen': 'Zwart scherm',
+    'nothing lights up': 'niets licht op',
+    'Screen off': 'Scherm uit',
+    'the sound goes on, e.g. the radio': 'het geluid gaat door, bv. de radio',
+    'The screen could not be switched off': 'Het scherm kon niet uit',
     'Theme': 'Thema',
     'selected': 'gekozen',
     'Getting the theme…': 'Thema ophalen…',
@@ -1358,6 +1626,43 @@ var TX = {
     'Could not read the running apps': 'Geöffnete Apps konnten nicht gelesen werden',
     'Inputs': 'Eingänge',
     'Home': 'Start',
+    'Antenna TV': 'Antennen-TV',
+    'Evening light': 'Abendlicht',
+    'lights the room softly': 'erhellt den Raum sanft',
+    'My photos': 'Meine Fotos',
+    'photos': 'Fotos',
+    'none yet: send some from your phone': 'noch keine: vom Handy schicken',
+    'Add photos...': 'Fotos hinzufügen...',
+    'Photos of the day': 'Bilder des Tages',
+    'Delete my photos': 'Meine Fotos löschen',
+    'Your photos are deleted': 'Deine Fotos sind gelöscht',
+    'Up and Down: brighter or darker · Left and Right: colour · other keys: back':
+      'Hoch und runter: heller oder dunkler · links und rechts: Farbe · andere Tasten: zurück',
+    'No photos now: the evening light instead': 'Gerade keine Fotos: stattdessen das Abendlicht',
+    'The photo page could not be opened': 'Die Fotoseite ließ sich nicht öffnen',
+    'type it in the phone’s browser (same Wi-Fi)': 'im Browser des Handys eingeben (gleiches WLAN)',
+    'Done': 'Fertig',
+    'photos received': 'Fotos empfangen',
+    'Radio': 'Radio',
+    'Mode': 'Modus',
+    'No': 'Nein',
+    'hold OK for 5 seconds': 'OK 5 Sekunden gedrückt halten',
+    'keep holding OK': 'OK weiter halten',
+    'LG’s own Home': 'LGs eigenes Home',
+    'Rename inputs...': 'Eingänge umbenennen...',
+    'Name for': 'Name für',
+    'OK saves · Back cancels · empty brings back LG’s name': 'OK speichert · Zurück bricht ab · leer stellt LGs Namen wieder her',
+    'Saved': 'Gespeichert',
+    'LG’s name is back': 'LGs Name ist zurück',
+    'This station does not play now': 'Dieser Sender spielt gerade nicht',
+    'No radio stations found': 'Keine Radiosender gefunden',
+    'Stop the radio': 'Radio stoppen',
+    'playing': 'läuft',
+    'Black screen': 'Schwarzer Bildschirm',
+    'nothing lights up': 'nichts leuchtet',
+    'Screen off': 'Bildschirm aus',
+    'the sound goes on, e.g. the radio': 'der Ton läuft weiter, z. B. das Radio',
+    'The screen could not be switched off': 'Der Bildschirm ließ sich nicht ausschalten',
     'Theme': 'Design',
     'selected': 'ausgewählt',
     'Getting the theme…': 'Design wird geladen…',
@@ -1417,6 +1722,43 @@ var TX = {
     'Could not read the running apps': 'Impossible de lire les apps ouvertes',
     'Inputs': 'Entrées',
     'Home': 'Accueil',
+    'Antenna TV': 'TV par antenne',
+    'Evening light': 'Lumière du soir',
+    'lights the room softly': 'éclaire doucement la pièce',
+    'My photos': 'Mes photos',
+    'photos': 'photos',
+    'none yet: send some from your phone': 'aucune : envoyez-en depuis le téléphone',
+    'Add photos...': 'Ajouter des photos...',
+    'Photos of the day': 'Photos du jour',
+    'Delete my photos': 'Supprimer mes photos',
+    'Your photos are deleted': 'Vos photos sont supprimées',
+    'Up and Down: brighter or darker · Left and Right: colour · other keys: back':
+      'Haut et bas : plus clair ou plus sombre · gauche et droite : couleur · autres touches : retour',
+    'No photos now: the evening light instead': 'Pas de photos : la lumière du soir à la place',
+    'The photo page could not be opened': 'La page photos n’a pas pu s’ouvrir',
+    'type it in the phone’s browser (same Wi-Fi)': 'à taper dans le navigateur du téléphone (même Wi-Fi)',
+    'Done': 'Terminé',
+    'photos received': 'photos reçues',
+    'Radio': 'Radio',
+    'Mode': 'Mode',
+    'No': 'Non',
+    'hold OK for 5 seconds': 'maintenez OK 5 secondes',
+    'keep holding OK': 'continuez à maintenir OK',
+    'LG’s own Home': 'L’accueil de LG',
+    'Rename inputs...': 'Renommer les entrées...',
+    'Name for': 'Nom pour',
+    'OK saves · Back cancels · empty brings back LG’s name': 'OK enregistre · Retour annule · vide rend le nom de LG',
+    'Saved': 'Enregistré',
+    'LG’s name is back': 'Le nom de LG est revenu',
+    'This station does not play now': 'Cette station ne joue pas en ce moment',
+    'No radio stations found': 'Aucune station de radio trouvée',
+    'Stop the radio': 'Arrêter la radio',
+    'playing': 'en cours',
+    'Black screen': 'Écran noir',
+    'nothing lights up': 'rien ne s’allume',
+    'Screen off': 'Écran éteint',
+    'the sound goes on, e.g. the radio': 'le son continue, p. ex. la radio',
+    'The screen could not be switched off': 'Impossible d’éteindre l’écran',
     'Theme': 'Thème',
     'selected': 'choisi',
     'Getting the theme…': 'Chargement du thème…',
@@ -1476,6 +1818,43 @@ var TX = {
     'Could not read the running apps': 'No se pudieron leer las apps abiertas',
     'Inputs': 'Entradas',
     'Home': 'Inicio',
+    'Antenna TV': 'TV por antena',
+    'Evening light': 'Luz de tarde',
+    'lights the room softly': 'ilumina la sala suavemente',
+    'My photos': 'Mis fotos',
+    'photos': 'fotos',
+    'none yet: send some from your phone': 'ninguna aún: envíalas desde el móvil',
+    'Add photos...': 'Añadir fotos...',
+    'Photos of the day': 'Fotos del día',
+    'Delete my photos': 'Borrar mis fotos',
+    'Your photos are deleted': 'Tus fotos se han borrado',
+    'Up and Down: brighter or darker · Left and Right: colour · other keys: back':
+      'Arriba y abajo: más o menos luz · izquierda y derecha: color · otras teclas: volver',
+    'No photos now: the evening light instead': 'Ahora no hay fotos: la luz de tarde en su lugar',
+    'The photo page could not be opened': 'No se pudo abrir la página de fotos',
+    'type it in the phone’s browser (same Wi-Fi)': 'escríbelo en el navegador del móvil (misma wifi)',
+    'Done': 'Listo',
+    'photos received': 'fotos recibidas',
+    'Radio': 'Radio',
+    'Mode': 'Modo',
+    'No': 'No',
+    'hold OK for 5 seconds': 'mantén OK 5 segundos',
+    'keep holding OK': 'sigue manteniendo OK',
+    'LG’s own Home': 'El inicio de LG',
+    'Rename inputs...': 'Renombrar entradas...',
+    'Name for': 'Nombre para',
+    'OK saves · Back cancels · empty brings back LG’s name': 'OK guarda · Atrás cancela · vacío recupera el nombre de LG',
+    'Saved': 'Guardado',
+    'LG’s name is back': 'Ha vuelto el nombre de LG',
+    'This station does not play now': 'Esta emisora no suena ahora',
+    'No radio stations found': 'No se encontraron emisoras de radio',
+    'Stop the radio': 'Parar la radio',
+    'playing': 'sonando',
+    'Black screen': 'Pantalla negra',
+    'nothing lights up': 'nada se ilumina',
+    'Screen off': 'Pantalla apagada',
+    'the sound goes on, e.g. the radio': 'el sonido sigue, p. ej. la radio',
+    'The screen could not be switched off': 'No se pudo apagar la pantalla',
     'Theme': 'Tema',
     'selected': 'elegido',
     'Getting the theme…': 'Cargando el tema…',
@@ -1535,6 +1914,43 @@ var TX = {
     'Could not read the running apps': 'Nije moguće pročitati pokrenute aplikacije',
     'Inputs': 'Ulazi',
     'Home': 'Početak',
+    'Antenna TV': 'TV program (antena)',
+    'Evening light': 'Večernje svjetlo',
+    'lights the room softly': 'lagano osvjetljava sobu',
+    'My photos': 'Moje slike',
+    'photos': 'slika',
+    'none yet: send some from your phone': 'još nema: pošaljite ih s mobitela',
+    'Add photos...': 'Dodaj slike...',
+    'Photos of the day': 'Slike dana',
+    'Delete my photos': 'Obriši moje slike',
+    'Your photos are deleted': 'Vaše slike su obrisane',
+    'Up and Down: brighter or darker · Left and Right: colour · other keys: back':
+      'Gore i dolje: jače ili slabije · lijevo i desno: boja · ostale tipke: natrag',
+    'No photos now: the evening light instead': 'Trenutno nema slika: umjesto njih večernje svjetlo',
+    'The photo page could not be opened': 'Stranica za slike se nije mogla otvoriti',
+    'type it in the phone’s browser (same Wi-Fi)': 'upišite je u preglednik na mobitelu (ista Wi-Fi mreža)',
+    'Done': 'Gotovo',
+    'photos received': 'slika primljeno',
+    'Radio': 'Radio',
+    'Mode': 'Mode',
+    'No': 'Ne',
+    'hold OK for 5 seconds': 'držite OK 5 sekundi',
+    'keep holding OK': 'nastavite držati OK',
+    'LG’s own Home': 'LG-ov početni zaslon',
+    'Rename inputs...': 'Preimenuj ulaze...',
+    'Name for': 'Naziv za',
+    'OK saves · Back cancels · empty brings back LG’s name': 'OK sprema · Natrag odustaje · prazno vraća LG-ov naziv',
+    'Saved': 'Spremljeno',
+    'LG’s name is back': 'Vraćen je LG-ov naziv',
+    'This station does not play now': 'Ova postaja trenutno ne svira',
+    'No radio stations found': 'Nema pronađenih radio postaja',
+    'Stop the radio': 'Zaustavi radio',
+    'playing': 'svira',
+    'Black screen': 'Crni zaslon',
+    'nothing lights up': 'ništa ne svijetli',
+    'Screen off': 'Ugasi ekran',
+    'the sound goes on, e.g. the radio': 'zvuk ide dalje, npr. radio',
+    'The screen could not be switched off': 'Ekran se nije mogao ugasiti',
     'Theme': 'Tema',
     'selected': 'odabrana',
     'Getting the theme…': 'Učitavanje teme…',
@@ -1886,7 +2302,7 @@ function barLabel(o) {
       ? t('Settings')
       : o.action === 'customize'
         ? t('Customise')
-        : o.action === 'theme' || o.action === 'home'
+        : o.action === 'theme' || o.action === 'home' || o.action === 'radio' || o.action === 'mode' || o.app === 'com.webos.app.livetv'
           ? t(o.label)
           : o.action === 'live'
             ? t('Live TV')
@@ -1960,6 +2376,7 @@ function perfMark(m) {
 var perfReady = false;
 function launch(id, params) {
   trailerStop();
+  radioStop();
   if (id === '__live') return LIVE.enter();
   api('/api/launch', { id: id, params: params }).then(function (x) {
     if (x && x.returnValue === false) toast(t('Could not open') + ' ' + id);
@@ -2520,8 +2937,13 @@ function act(e) {
   var o = e._o || {};
   if (o.action === 'customize') return customizeMenu();
   if (o.action === 'theme') return themeMenu();
+  if (o.action === 'radio') return radioMenu();
+  if (o.action === 'mode') return modeMenu();
   if (o.action === 'home') return railLeave(1, 0);
-  if (o.action === 'live') return LIVE.enter();
+  if (o.action === 'live') {
+    radioStop();
+    return LIVE.enter();
+  }
   if (o.action === 'inputs') return inputsMenu();
   if (o.app) launch(o.app, o.params);
 }
@@ -2594,9 +3016,45 @@ function drawMenu() {
     if (it.sub) row.querySelector('.st').textContent = it.sub;
     row.addEventListener('click', function () {
       m.idx = +row.getAttribute('data-i');
+      if (it.hold) return;
       pickMenu();
     });
+    if (it.hold) {
+      row.addEventListener('mousedown', function () {
+        m.idx = +row.getAttribute('data-i');
+        holdStart(it);
+      });
+      row.addEventListener('mouseup', holdEnd);
+      row.addEventListener('mouseleave', holdEnd);
+    }
   });
+}
+/* a row with hold: ms runs only when OK is held that long; the row counts down, letting go early does nothing */
+var holdIt = null,
+  holdT = 0,
+  holdIv = 0;
+function holdStart(it) {
+  if (holdIt) return;
+  holdIt = it;
+  var t0 = Date.now(),
+    st = ovEl && ovEl.querySelector('.row.f .st');
+  holdIv = setInterval(function () {
+    if (st) st.textContent = t('keep holding OK') + ' ' + Math.max(1, Math.ceil((it.hold - (Date.now() - t0)) / 1000)) + ' s';
+  }, 200);
+  holdT = setTimeout(function () {
+    clearInterval(holdIv);
+    holdIt = null;
+    it.fn();
+  }, it.hold);
+}
+function holdEnd() {
+  if (!holdIt) return;
+  var it = holdIt;
+  holdIt = null;
+  clearTimeout(holdT);
+  clearInterval(holdIv);
+  var st = ovEl && ovEl.querySelector('.row.f .st');
+  if (st) st.textContent = it.sub || '';
 }
 function pickMenu() {
   var m = stack[stack.length - 1],
@@ -2615,8 +3073,10 @@ function menuKey(k) {
   } else if (k === 40 && m.idx < m.items.length - 1) {
     m.idx++;
     drawMenu();
-  } else if (k === 13) pickMenu();
-  else if (k === 461 || k === 27 || k === 8) backMenu();
+  } else if (k === 13) {
+    if (m.items[m.idx] && m.items[m.idx].hold) holdStart(m.items[m.idx]);
+    else pickMenu();
+  } else if (k === 461 || k === 27 || k === 8) backMenu();
   else return false;
   return true;
 }
@@ -2712,8 +3172,75 @@ function inputsMenu() {
           },
         };
       });
+    items.push({
+      icon: 'edit',
+      label: t('Rename inputs...'),
+      stay: true,
+      fn: function () {
+        renameList(x.devices || []);
+      },
+    });
     openMenu(t('Inputs'), items);
   });
+}
+/* names for the inputs, typed on the TV with the remote (the TV's own keyboard comes up); the service shows them in every inputs list */
+function renameList(devs) {
+  openMenu(
+    t('Rename inputs...'),
+    devs
+      .filter(function (d) {
+        return d.appId;
+      })
+      .map(function (d) {
+        return {
+          icon: 'hdmi',
+          label: d.label || 'HDMI ' + d.port,
+          sub: d.lgLabel ? 'LG: ' + d.lgLabel : 'HDMI ' + d.port,
+          fn: function () {
+            renameInput(d);
+          },
+        };
+      })
+  );
+}
+var renaming = false;
+function renameInput(d) {
+  closeMenus();
+  renaming = true;
+  var w = document.createElement('div');
+  w.id = 'ren';
+  w.innerHTML = '<div class="panel"><h2></h2><input id="ren-in" type="text" maxlength="30" autocomplete="off"><p></p></div>';
+  w.querySelector('h2').textContent = t('Name for') + ' ' + (d.lgLabel || d.label || 'HDMI ' + d.port);
+  w.querySelector('p').textContent = t('OK saves · Back cancels · empty brings back LG’s name');
+  document.body.appendChild(w);
+  var inp = w.querySelector('input');
+  inp.value = d.lgLabel ? d.label : '';
+  var done = function (save) {
+    renaming = false;
+    if (w.parentNode) w.parentNode.removeChild(w);
+    if (!save) return;
+    var names = {},
+      v = inp.value.replace(/\s+/g, ' ').trim().slice(0, 30),
+      k;
+    for (k in cfg.inputNames || {}) names[k] = cfg.inputNames[k];
+    if (v) names[d.appId] = v;
+    else delete names[d.appId];
+    cfg.inputNames = names;
+    saveCfg();
+    toast(v ? t('Saved') + ': ' + v : t('LG’s name is back'));
+  };
+  inp.addEventListener('keydown', function (e) {
+    if (e.keyCode === 13) {
+      e.preventDefault();
+      done(true);
+    } else if (e.keyCode === 461 || e.keyCode === 27) {
+      e.preventDefault();
+      done(false);
+    }
+  });
+  setTimeout(function () {
+    inp.focus();
+  }, 50);
 }
 
 function appMenu(a) {
@@ -2854,11 +3381,13 @@ function customizeMenu() {
    so a stray OK does not switch. The service restarts the TV; CleanYourTV as Home in the manager app switches back. */
 function lgHomeMenu() {
   openMenu(t('Use LG’s Home?'), [
-    { label: t('Cancel'), stay: true, fn: backMenu },
+    { label: t('No'), fn: closeMenus },
     {
       label: t('Yes, use LG’s Home'),
-      sub: t('the TV restarts'),
+      sub: t('hold OK for 5 seconds'),
+      hold: 5000,
       fn: function () {
+        closeMenus();
         api('/api/undo', {}).then(
           function () {
             toast(t('Switching to LG’s Home… the TV restarts in a moment.'));
@@ -2871,33 +3400,40 @@ function lgHomeMenu() {
     },
   ]);
 }
-/* the Theme button (themes with the strip on the left): the themes of manager > Theme, and Customise, which has no button of its own then */
+/* the Theme button (themes with the strip on the left): this TV's own themes (MENU_THEMES), LG's own Home behind a confirmation, and
+   Customise, which has no button of its own then */
 function themeMenu() {
   api('/api/theme/list').then(
     function (x) {
       var cur = (x.current && x.current.id) || '',
-        items = (x.themes || []).map(function (th) {
-          return {
-            label: th.name,
-            sub: th.id === cur ? t('selected') : '',
-            fn: function () {
-              if (th.id === cur) return;
-              toast(t('Getting the theme…'));
-              api('/api/theme/set', { id: th.id }).then(
-                function (y) {
-                  if (y.error) toast(t('Could not change the theme'));
-                  else load();
-                },
-                function () {
-                  toast(t('Could not change the theme'));
-                }
-              );
-            },
-          };
-        });
+        items = (x.themes || [])
+          .filter(function (th) {
+            return MENU_THEMES.indexOf(th.id) >= 0;
+          })
+          .map(function (th) {
+            return {
+              label: th.name,
+              sub: th.id === cur ? t('selected') : '',
+              sel: th.id === cur,
+              fn: function () {
+                if (th.id === cur) return;
+                toast(t('Getting the theme…'));
+                api('/api/theme/set', { id: th.id }).then(
+                  function (y) {
+                    if (y.error) toast(t('Could not change the theme'));
+                    else load();
+                  },
+                  function () {
+                    toast(t('Could not change the theme'));
+                  }
+                );
+              },
+            };
+          });
+      items.push({ label: 'LG', sub: t('LG’s own Home'), stay: true, fn: lgHomeMenu });
       items.push({ icon: 'edit', label: t('Customise'), stay: true, fn: customizeMenu });
       openMenu(t('Theme'), items);
-      for (var i = 0; i < items.length; i++) if (items[i].sub) stack[stack.length - 1].idx = i;
+      for (var i = 0; i < items.length; i++) if (items[i].sel) stack[stack.length - 1].idx = i;
       drawMenu();
     },
     function () {
@@ -3014,14 +3550,20 @@ function rebuild() {
     fit(t, false);
     return t;
   });
-  /* with the strip on the left (theme rail.show) the top bar has only the Theme button; Live TV is among the apps, so it is left off the strip */
+  /* with the strip on the left (theme rail.show): Home, Antenna TV, Radio, your buttons and Theme on the strip (Live TV is among the
+     apps, so it is left off), and only the Mode button in the top bar */
   railEls = TH.rail
-    ? [{ label: 'Home', icon: 'home', action: 'home', fixed: true }]
+    ? [
+        { label: 'Home', icon: 'home', action: 'home', fixed: true },
+        { label: 'Antenna TV', icon: 'antenna', app: 'com.webos.app.livetv', fixed: true },
+        { label: 'Radio', icon: 'radio', action: 'radio', fixed: true },
+      ]
         .concat(
           shownBar().filter(function (o) {
             return o.action !== 'live';
           })
         )
+        .concat([{ label: 'Theme', icon: 'theme', action: 'theme', fixed: true }])
         .map(function (o) {
           var b = document.createElement('div');
           b.className = 'rb';
@@ -3034,7 +3576,7 @@ function rebuild() {
     : [];
   var tb = (
     TH.rail
-      ? [{ label: 'Theme', icon: 'theme', action: 'theme', fixed: true }]
+      ? [{ label: 'Mode', icon: 'mode', action: 'mode', fixed: true }]
       : shownBar().concat([{ label: 'Customise', icon: 'edit', action: 'customize', fixed: true }])
   ).map(function (o) {
     var p = document.createElement('div');
@@ -3098,12 +3640,15 @@ function load() {
       setTimeout(load, 3000);
     });
 }
-/* ---------- trailers (manager > Trailers): while the focus rests on a streaming app, a trailer of something popular on it plays
-   quietly behind the home screen. The service finds them (TMDB) and serves the player page; this only shows and removes it. The player
-   is removed, not paused, whenever the focus moves or anything opens, so the TV's video pipeline is free for the app. ---------- */
-var TRL_WAIT = 2500,
+/* ---------- trailers (manager > Trailers): while the focus rests on a streaming app, a popular film or series on it fills the screen
+   behind Home: first its picture, title and a short description, then, TRL_WAIT after the focus arrived, its trailer, quietly. The
+   service finds them (TMDB) and serves the player page; this only shows and removes them. The player is removed, not paused, whenever
+   the focus moves or anything opens, so the TV's video pipeline is free for the app. ---------- */
+var HERO_WAIT = 300 /* ms the focus rests before the picture comes: moving along the row does not flash every title */,
+  TRL_WAIT = 2000 /* ms from the focus arriving to the trailer starting */,
   TRL_AGE = 6 * 3600 * 1000,
   trlT = 0,
+  trlAt = 0,
   trlFor = '',
   trlFrame = null,
   trlCache = {},
@@ -3115,43 +3660,76 @@ function trlRegion() {
   var m = /^[a-z]{2}-([A-Z]{2})/.exec(LOC);
   return m ? m[1] : '';
 }
-/* called on every focus change: a tile of the dock row (or of a grid that stays in view) waits, then plays */
+/* called on every focus change: a tile of the dock row (or of a grid that stays in view) shows a title, then its trailer */
+function isStreaming(a) {
+  return (
+    a.id !== '__live' &&
+    STREAMING.some(function (re) {
+      return re.test(a.title);
+    })
+  );
+}
 function trailerFocus(e) {
   var a = e && e._a,
-    id = a && !a.sys && trailersOn() && (r === 1 || (!TH.push && !TH.overlay)) ? a.id : '';
+    id = a && !a.sys && (trailersOn() || isStreaming(a)) && (r === 1 || (!TH.push && !TH.overlay)) ? a.id : '';
   if (id && id === trlFor) return;
   trailerStop();
   if (!id) return;
   trlFor = id;
+  trlAt = Date.now();
   trlT = setTimeout(function () {
     trailerLoad(a);
-  }, TRL_WAIT);
+  }, HERO_WAIT);
 }
 function trailerLoad(a) {
+  if (!trailersOn()) return trailerLogo(a);
   var c = trlCache[a.id];
-  if (c && Date.now() - c.at < TRL_AGE) return trailerPlay(a, c.items);
+  if (c && Date.now() - c.at < TRL_AGE) return trailerShow(a, c.items);
   api('/api/trailers/for?title=' + encodeURIComponent(a.title) + '&region=' + trlRegion() + '&lang=' + encodeURIComponent(LOC)).then(
     function (x) {
       var items = (x && x.items) || [];
       if (!(x && x.error)) trlCache[a.id] = { at: Date.now(), items: items };
-      trailerPlay(a, items);
+      trailerShow(a, items);
     },
     function () {}
   );
 }
-function trailerPlay(a, items) {
-  if (trlFor !== a.id || !items.length) return;
+/* the picture, the title and the description at once; the trailer when TRL_WAIT has passed since the focus arrived */
+function trailerShow(a, items) {
+  if (trlFor !== a.id) return;
+  if (!items.length) return trailerLogo(a);
   var n = trlTurn[a.id] || 0,
-    it = items[n % items.length],
-    w = $('trl');
+    it = items[n % items.length];
   trlTurn[a.id] = n + 1;
   $('trl-bd').style.backgroundImage = it.backdrop ? 'url("' + it.backdrop + '")' : 'none';
-  $('trl-cap').textContent = it.title + (it.year ? ' (' + it.year + ')' : '');
-  w.classList.add('on');
+  $('trl-t').textContent = it.title + (it.year ? ' (' + it.year + ')' : '');
+  $('trl-o').textContent = it.overview || '';
+  $('trl').classList.add('on');
+  document.body.classList.add('hero');
+  trlT = setTimeout(
+    function () {
+      trailerPlay(a, it);
+    },
+    Math.max(0, TRL_WAIT - (Date.now() - trlAt))
+  );
+}
+/* an app without films to show (YouTube, or trailers off): its own logo, large, and its name */
+function trailerLogo(a) {
+  if (trlFor !== a.id || !isStreaming(a)) return;
+  $('trl-bd').style.backgroundImage = 'none';
+  $('trl-logo').src = API + '/icon/' + encodeURIComponent(a.id);
+  $('trl-t').textContent = a.title;
+  $('trl-o').textContent = '';
+  $('trl').classList.add('on');
+  $('trl').classList.add('logo');
+  document.body.classList.add('hero');
+}
+function trailerPlay(a, it) {
+  if (trlFor !== a.id || !it.video || radioOn()) return; /* the radio has the sound: the picture stays */
   trlFrame = document.createElement('iframe');
   trlFrame.setAttribute('allow', 'autoplay');
   trlFrame.src = API + '/api/trailers/player?v=' + encodeURIComponent(it.video) + '&vol=' + ((cfg.trailers && cfg.trailers.volume) || 0);
-  w.appendChild(trlFrame);
+  $('trl').appendChild(trlFrame);
 }
 function trailerStop() {
   clearTimeout(trlT);
@@ -3162,7 +3740,11 @@ function trailerStop() {
     trlFrame = null;
   }
   var w = $('trl');
-  if (w) w.classList.remove('on');
+  if (w) {
+    w.classList.remove('on');
+    w.classList.remove('logo');
+  }
+  document.body.classList.remove('hero');
 }
 window.addEventListener('message', function (ev) {
   if (!trlFrame || ev.source !== trlFrame.contentWindow) return;
@@ -3174,6 +3756,318 @@ window.addEventListener('message', function (ev) {
     trlFrame = null;
   }
 });
+/* ---------- radio (the Radio button on the strip): the stations of the TV's country from the service, played here. It goes on in a
+   Mode screen and stops when an app or Live TV opens, or Home is left. The TV has no FM tuner: these are the stations' own streams. ---------- */
+var radioEl = null,
+  radioNow = null,
+  radioList = null;
+function radioOn() {
+  return !!radioNow;
+}
+function radioStop() {
+  if (radioEl) {
+    radioEl.pause();
+    radioEl.removeAttribute('src');
+    try {
+      radioEl.load();
+    } catch (e) {}
+  }
+  radioNow = null;
+}
+function radioPlay(s) {
+  trailerStop();
+  if (!radioEl) {
+    radioEl = document.createElement('audio');
+    radioEl.preload = 'none';
+    radioEl.addEventListener('error', function () {
+      if (radioNow && radioEl.getAttribute('src')) {
+        toast(t('This station does not play now') + ': ' + radioNow.name);
+        radioStop();
+      }
+    });
+  }
+  radioNow = s;
+  radioEl.src = s.url;
+  var p = radioEl.play();
+  if (p && p.catch)
+    p.catch(function () {
+      if (radioNow === s) {
+        toast(t('This station does not play now') + ': ' + s.name);
+        radioStop();
+      }
+    });
+}
+function radioMenu() {
+  if (radioList) return radioRows();
+  var m = /^[a-z]{2}-([A-Z]{2})/.exec(LOC);
+  api('/api/radio/stations?country=' + (m ? m[1] : '')).then(
+    function (x) {
+      if (!x.stations || !x.stations.length) return toast(t('No radio stations found'));
+      radioList = x.stations;
+      radioRows();
+    },
+    function () {
+      toast(t('No radio stations found'));
+    }
+  );
+}
+function radioRows() {
+  var items = [];
+  if (radioNow)
+    items.push({
+      icon: 'radio',
+      label: t('Stop the radio'),
+      sub: radioNow.name,
+      fn: radioStop,
+    });
+  radioList.forEach(function (s) {
+    items.push({
+      label: s.name,
+      sub: radioNow && radioNow.id === s.id ? t('playing') : '',
+      stay: true,
+      fn: function () {
+        radioPlay(s);
+        var top = stack[stack.length - 1],
+          i = top ? top.idx : 0;
+        backMenu();
+        radioRows();
+        stack[stack.length - 1].idx = Math.min(i + (items[0].fn === radioStop ? 0 : 1), stack[stack.length - 1].items.length - 1);
+        drawMenu();
+      },
+    });
+  });
+  openMenu(t('Radio'), items);
+}
+/* ---------- Mode (the button at the top right): what the TV shows while nobody watches. Evening light that lights the room softly, your
+   own photos (sent from a phone), photos of the day, a black screen, or the screen off with the sound kept. The radio goes on; any key
+   comes back to Home (in the evening light the arrows set it). Only transform and opacity move (the GPU is weak), and a clock moves now
+   and then so nothing stays in one place. ---------- */
+var modeEl = null,
+  modeAt = 0,
+  modeT = 0,
+  modeIv = 0,
+  modePhotos = null,
+  modeTurn = 0,
+  modeKind = '';
+/* the evening light: [name, base, three soft lights]; and how much of it shines, darkest first */
+var LIGHTS = [
+    ['Warm', '#3a1c0a', ['#ff9a4a', '#ffb067', '#e0703a']],
+    ['Candle', '#2e1206', ['#ff7a2a', '#ffc06a', '#c8501e']],
+    ['Rose', '#2e1220', ['#ff8a8a', '#ffb3a0', '#d0607a']],
+    ['Sea', '#081a26', ['#3aa0c8', '#5ac0b0', '#2a6aa8']],
+  ],
+  DIMS = [0.8, 0.65, 0.5, 0.35, 0.2],
+  light = { c: 0, d: 1 };
+try {
+  var sv = JSON.parse(localStorage.getItem('cytv.light') || '{}');
+  if (sv.c >= 0 && sv.c < LIGHTS.length) light.c = sv.c;
+  if (sv.d >= 0 && sv.d < DIMS.length) light.d = sv.d;
+} catch (e) {}
+function modeOn() {
+  return !!modeEl;
+}
+function modeMenu() {
+  api('/api/photos/list').then(
+    function (x) {
+      modeRows((x && x.photos) || []);
+    },
+    function () {
+      modeRows([]);
+    }
+  );
+}
+function modeRows(mine) {
+  var items = [
+    { label: t('Evening light'), sub: t('lights the room softly'), fn: modeLight },
+    {
+      label: t('My photos'),
+      sub: mine.length ? mine.length + ' ' + t('photos') : t('none yet: send some from your phone'),
+      stay: !mine.length,
+      fn: function () {
+        if (mine.length) modeSlides(mine, true);
+        else photosFromPhone();
+      },
+    },
+    { label: t('Add photos...'), stay: true, fn: photosFromPhone },
+    { label: t('Photos of the day'), sub: 'Wikimedia Commons', fn: modeWiki },
+    { label: t('Black screen'), sub: t('nothing lights up'), fn: modeBlack },
+    { label: t('Screen off'), sub: t('the sound goes on, e.g. the radio'), fn: modeScreenOff },
+  ];
+  if (mine.length)
+    items.push({
+      label: t('Delete my photos'),
+      sub: t('hold OK for 5 seconds'),
+      hold: 5000,
+      fn: function () {
+        closeMenus();
+        api('/api/photos/clear', {}).then(function () {
+          toast(t('Your photos are deleted'));
+        });
+      },
+    });
+  openMenu(t('Mode'), items);
+}
+function modeBegin(kind) {
+  closeMenus();
+  trailerStop();
+  modeExit(true);
+  modeEl = document.createElement('div');
+  modeEl.id = 'mode';
+  modeEl.className = kind;
+  modeKind = kind;
+  document.body.appendChild(modeEl);
+  modeAt = Date.now();
+  return modeEl;
+}
+/* any key ends it, except the one still held from choosing it */
+function modeExit(force) {
+  if (!modeEl || (!force && Date.now() - modeAt < 800)) return;
+  clearTimeout(modeT);
+  clearInterval(modeIv);
+  if (modeEl.parentNode) modeEl.parentNode.removeChild(modeEl);
+  modeEl = null;
+  modeKind = '';
+}
+/* the keys a Mode screen uses itself: in the evening light, Up and Down set how bright, Left and Right the colour */
+function modeKey(k) {
+  if (modeKind !== 'light' || k < 37 || k > 40) return false;
+  if (k === 38) light.d = Math.min(DIMS.length - 1, light.d + 1);
+  else if (k === 40) light.d = Math.max(0, light.d - 1);
+  else light.c = (light.c + (k === 39 ? 1 : LIGHTS.length - 1)) % LIGHTS.length;
+  try {
+    localStorage.setItem('cytv.light', JSON.stringify(light));
+  } catch (e) {}
+  lightPaint();
+  return true;
+}
+function modeClock(w, small) {
+  var c = document.createElement('div');
+  c.className = 'mclk' + (small ? ' small' : '');
+  c.innerHTML = '<div class="mt"></div><div class="md"></div>';
+  w.appendChild(c);
+  var n = 0,
+    draw = function () {
+      var d = new Date();
+      try {
+        c.firstChild.textContent = d.toLocaleTimeString(LOC, clockOpts());
+        c.lastChild.textContent = d.toLocaleDateString(LOC, { weekday: 'long', day: 'numeric', month: 'long' });
+      } catch (e) {
+        c.firstChild.textContent = ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+      }
+      /* a new place every few minutes, within the screen */
+      if (n++ % 12 === 0)
+        c.style.transform = 'translate(' + Math.round(Math.random() * 1100) + 'px,' + Math.round(Math.random() * 640) + 'px)';
+    };
+  draw();
+  modeIv = setInterval(draw, 15000);
+}
+function modeLight() {
+  var w = modeBegin('light');
+  w.innerHTML =
+    '<div class="lb0"></div><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="ldim"></div>' +
+    '<div class="lhint"></div>';
+  w.querySelector('.lhint').textContent = t('Up and Down: brighter or darker · Left and Right: colour · other keys: back');
+  modeClock(w, true);
+  lightPaint();
+  modeT = setTimeout(function () {
+    var h = w.querySelector('.lhint');
+    if (h) h.classList.add('gone');
+  }, 7000);
+}
+function lightPaint() {
+  if (!modeEl || modeKind !== 'light') return;
+  var L = LIGHTS[light.c],
+    bs = modeEl.querySelectorAll('.blob');
+  modeEl.querySelector('.lb0').style.background = L[1];
+  for (var i = 0; i < bs.length; i++) bs[i].style.background = 'radial-gradient(closest-side, ' + L[2][i] + ', rgba(0,0,0,0))';
+  modeEl.querySelector('.ldim').style.opacity = String(DIMS[light.d]);
+}
+function modeBlack() {
+  modeBegin('black');
+}
+function modeScreenOff() {
+  modeBegin('black');
+  api('/api/ambient/screen-off', {}).then(
+    function (x) {
+      if (x && x.returnValue === false) toast(t('The screen could not be switched off'));
+    },
+    function () {
+      toast(t('The screen could not be switched off'));
+    }
+  );
+}
+function modeWiki() {
+  if (modePhotos) return modeSlides(modePhotos, false);
+  var w = modeBegin('slides');
+  api('/api/ambient/photos').then(
+    function (x) {
+      if (modeEl !== w) return;
+      var list = (x && x.photos) || [];
+      if (list.length) modePhotos = list;
+      modeSlides(list, false);
+    },
+    function () {
+      if (modeEl === w) modeSlides([], false);
+    }
+  );
+}
+/* a slideshow: your photos whole (turned the way the phone held them), photos of the day across the screen with their credit */
+function modeSlides(list, mine) {
+  if (!list.length) {
+    toast(t('No photos now: the evening light instead'));
+    return modeLight();
+  }
+  var w = modeBegin('slides' + (mine ? ' mine' : ''));
+  w.innerHTML = '<div class="mph"></div><div class="mph"></div><div class="mcap"></div>';
+  var layers = w.querySelectorAll('.mph'),
+    cap = w.querySelector('.mcap'),
+    show = function () {
+      var p = list[modeTurn++ % list.length],
+        url = mine ? API + p.url : p.url,
+        img = new Image();
+      img.onload = function () {
+        if (modeEl !== w) return;
+        var next = layers[modeTurn % 2],
+          prev = layers[(modeTurn + 1) % 2],
+          turn = mine ? p.turn || 0 : 0;
+        next.style.backgroundImage = 'url("' + url + '")';
+        next.className = 'mph on' + (turn === 90 || turn === 270 ? ' side' : '');
+        next.style.transform = turn ? 'rotate(' + turn + 'deg)' : '';
+        prev.classList.remove('on');
+        cap.textContent = mine ? '' : (p.title ? p.title + ' · ' : '') + p.credit;
+      };
+      img.onerror = function () {
+        clearTimeout(modeT);
+        modeT = setTimeout(show, 2000);
+      };
+      img.src = url;
+      clearTimeout(modeT);
+      modeT = setTimeout(show, mine ? 15000 : 30000);
+    };
+  show();
+}
+/* sending photos from a phone: the service opens a page on the home network at a short address, shown here */
+function photosFromPhone() {
+  api('/api/photos/pair', {}).then(
+    function (x) {
+      if (!x || !x.url) return toast(t('The photo page could not be opened'));
+      openMenu(t('Add photos...'), [
+        { label: x.url, sub: t('type it in the phone’s browser (same Wi-Fi)'), stay: true, fn: function () {} },
+        {
+          label: t('Done'),
+          fn: function () {
+            api('/api/photos/pair-stop', {}).then(function (y) {
+              toast(((y && y.added) || 0) + ' ' + t('photos received'));
+            });
+          },
+        },
+      ]);
+    },
+    function () {
+      toast(t('The photo page could not be opened'));
+    }
+  );
+}
 /* ---------- input: tap OK to open, hold OK for options ---------- */
 var lastMove = 0,
   snapT = 0,
@@ -3234,6 +4128,12 @@ document.addEventListener('mousemove', function (ev) {
 document.addEventListener('keydown', function (e) {
   var k = e.keyCode;
   lastKey = Date.now();
+  if (renaming) return; /* the name field has the keys */
+  if (modeOn()) {
+    if (!modeKey(k)) modeExit();
+    e.preventDefault();
+    return;
+  } /* any key ends a Mode screen, except the ones it uses itself */
   if (LIVE.on) {
     LIVE.key(e);
     return;
@@ -3308,7 +4208,8 @@ document.addEventListener('keydown', function (e) {
   e.preventDefault();
 });
 document.addEventListener('keyup', function (e) {
-  if (e.keyCode !== 13) return;
+  if (e.keyCode !== 13 || renaming) return;
+  holdEnd();
   lastKey = Date.now();
   clearTimeout(downT);
   var pr = document.querySelector('.press');
@@ -3352,6 +4253,7 @@ document.addEventListener('webOSRelaunch', function () {
 document.addEventListener('visibilitychange', function () {
   if (document.hidden) {
     trailerStop();
+    radioStop();
     if (LIVE.on) LIVE.exit();
     closeRunningMenu();
   } else load();

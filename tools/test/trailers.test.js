@@ -36,6 +36,7 @@ run(async () => {
             id: tv ? 20 : 10,
             [tv ? 'name' : 'title']: tv ? 'Series A' : 'Film A',
             backdrop_path: '/a.jpg',
+            overview: tv ? 'Short.' : 'A long description of the film. '.repeat(20),
             [tv ? 'first_air_date' : 'release_date']: '2025-03-01',
           },
           { id: tv ? 21 : 11, [tv ? 'name' : 'title']: tv ? 'Series B' : 'Film B', backdrop_path: null },
@@ -85,9 +86,13 @@ run(async () => {
       it[1].video === 'trail_hr_20' &&
       it[0].year === '2025' &&
       it[0].kind === 'movie' &&
+      it[1].overview === 'Short.' &&
+      it[0].overview.length <= 240 &&
+      /^A long description .* A long…$/.test(it[0].overview) &&
+      it[2].overview === '' &&
       it[0].backdrop === 'https://image.tmdb.org/t/p/w1280/a.jpg' &&
       it[2].backdrop === '',
-    'Netflix in Croatia: popular films and series in turn, each with its official trailer in Croatian; a title without a YouTube trailer is left out'
+    'Netflix in Croatia: popular films and series in turn, each with its official trailer in Croatian and a short description cut at a word; a title without a YouTube trailer is left out'
   );
   ok(
     noCartoons.sort().join(' ') === '16,10751 16,10751,10762' && !it.some(x => x.title === 'A cartoon' || x.title === 'A family film'),

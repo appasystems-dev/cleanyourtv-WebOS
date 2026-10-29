@@ -13,6 +13,7 @@ local network on request, and an optional notification endpoint is off by defaul
 | 8768 and up | Share-log page | Ten minutes, at a random address, with a masked report |
 | 8769 | Voice setup page | Ten minutes, at a random 128-bit address, closed after saving |
 | 8791 | Trailers: TMDB key page | Ten minutes, at a random 128-bit address, closed after saving |
+| 8792 | Photos from your phone | Fifteen minutes, at a 6-digit address shown on the TV; closed after 30 wrong addresses or Done; takes only JPEG, PNG and WebP |
 
 What the setup changes on the TV is listed in [What it changes on the TV](tv-changes.md).
 

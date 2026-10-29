@@ -67,9 +67,45 @@ function drawMenu() {
     if (it.sub) row.querySelector('.st').textContent = it.sub;
     row.addEventListener('click', function () {
       m.idx = +row.getAttribute('data-i');
+      if (it.hold) return;
       pickMenu();
     });
+    if (it.hold) {
+      row.addEventListener('mousedown', function () {
+        m.idx = +row.getAttribute('data-i');
+        holdStart(it);
+      });
+      row.addEventListener('mouseup', holdEnd);
+      row.addEventListener('mouseleave', holdEnd);
+    }
   });
+}
+/* a row with hold: ms runs only when OK is held that long; the row counts down, letting go early does nothing */
+var holdIt = null,
+  holdT = 0,
+  holdIv = 0;
+function holdStart(it) {
+  if (holdIt) return;
+  holdIt = it;
+  var t0 = Date.now(),
+    st = ovEl && ovEl.querySelector('.row.f .st');
+  holdIv = setInterval(function () {
+    if (st) st.textContent = t('keep holding OK') + ' ' + Math.max(1, Math.ceil((it.hold - (Date.now() - t0)) / 1000)) + ' s';
+  }, 200);
+  holdT = setTimeout(function () {
+    clearInterval(holdIv);
+    holdIt = null;
+    it.fn();
+  }, it.hold);
+}
+function holdEnd() {
+  if (!holdIt) return;
+  var it = holdIt;
+  holdIt = null;
+  clearTimeout(holdT);
+  clearInterval(holdIv);
+  var st = ovEl && ovEl.querySelector('.row.f .st');
+  if (st) st.textContent = it.sub || '';
 }
 function pickMenu() {
   var m = stack[stack.length - 1],
@@ -88,8 +124,10 @@ function menuKey(k) {
   } else if (k === 40 && m.idx < m.items.length - 1) {
     m.idx++;
     drawMenu();
-  } else if (k === 13) pickMenu();
-  else if (k === 461 || k === 27 || k === 8) backMenu();
+  } else if (k === 13) {
+    if (m.items[m.idx] && m.items[m.idx].hold) holdStart(m.items[m.idx]);
+    else pickMenu();
+  } else if (k === 461 || k === 27 || k === 8) backMenu();
   else return false;
   return true;
 }
@@ -185,8 +223,75 @@ function inputsMenu() {
           },
         };
       });
+    items.push({
+      icon: 'edit',
+      label: t('Rename inputs...'),
+      stay: true,
+      fn: function () {
+        renameList(x.devices || []);
+      },
+    });
     openMenu(t('Inputs'), items);
   });
+}
+/* names for the inputs, typed on the TV with the remote (the TV's own keyboard comes up); the service shows them in every inputs list */
+function renameList(devs) {
+  openMenu(
+    t('Rename inputs...'),
+    devs
+      .filter(function (d) {
+        return d.appId;
+      })
+      .map(function (d) {
+        return {
+          icon: 'hdmi',
+          label: d.label || 'HDMI ' + d.port,
+          sub: d.lgLabel ? 'LG: ' + d.lgLabel : 'HDMI ' + d.port,
+          fn: function () {
+            renameInput(d);
+          },
+        };
+      })
+  );
+}
+var renaming = false;
+function renameInput(d) {
+  closeMenus();
+  renaming = true;
+  var w = document.createElement('div');
+  w.id = 'ren';
+  w.innerHTML = '<div class="panel"><h2></h2><input id="ren-in" type="text" maxlength="30" autocomplete="off"><p></p></div>';
+  w.querySelector('h2').textContent = t('Name for') + ' ' + (d.lgLabel || d.label || 'HDMI ' + d.port);
+  w.querySelector('p').textContent = t('OK saves · Back cancels · empty brings back LG’s name');
+  document.body.appendChild(w);
+  var inp = w.querySelector('input');
+  inp.value = d.lgLabel ? d.label : '';
+  var done = function (save) {
+    renaming = false;
+    if (w.parentNode) w.parentNode.removeChild(w);
+    if (!save) return;
+    var names = {},
+      v = inp.value.replace(/\s+/g, ' ').trim().slice(0, 30),
+      k;
+    for (k in cfg.inputNames || {}) names[k] = cfg.inputNames[k];
+    if (v) names[d.appId] = v;
+    else delete names[d.appId];
+    cfg.inputNames = names;
+    saveCfg();
+    toast(v ? t('Saved') + ': ' + v : t('LG’s name is back'));
+  };
+  inp.addEventListener('keydown', function (e) {
+    if (e.keyCode === 13) {
+      e.preventDefault();
+      done(true);
+    } else if (e.keyCode === 461 || e.keyCode === 27) {
+      e.preventDefault();
+      done(false);
+    }
+  });
+  setTimeout(function () {
+    inp.focus();
+  }, 50);
 }
 
 function appMenu(a) {
@@ -327,11 +432,13 @@ function customizeMenu() {
    so a stray OK does not switch. The service restarts the TV; CleanYourTV as Home in the manager app switches back. */
 function lgHomeMenu() {
   openMenu(t('Use LG’s Home?'), [
-    { label: t('Cancel'), stay: true, fn: backMenu },
+    { label: t('No'), fn: closeMenus },
     {
       label: t('Yes, use LG’s Home'),
-      sub: t('the TV restarts'),
+      sub: t('hold OK for 5 seconds'),
+      hold: 5000,
       fn: function () {
+        closeMenus();
         api('/api/undo', {}).then(
           function () {
             toast(t('Switching to LG’s Home… the TV restarts in a moment.'));
@@ -344,33 +451,40 @@ function lgHomeMenu() {
     },
   ]);
 }
-/* the Theme button (themes with the strip on the left): the themes of manager > Theme, and Customise, which has no button of its own then */
+/* the Theme button (themes with the strip on the left): this TV's own themes (MENU_THEMES), LG's own Home behind a confirmation, and
+   Customise, which has no button of its own then */
 function themeMenu() {
   api('/api/theme/list').then(
     function (x) {
       var cur = (x.current && x.current.id) || '',
-        items = (x.themes || []).map(function (th) {
-          return {
-            label: th.name,
-            sub: th.id === cur ? t('selected') : '',
-            fn: function () {
-              if (th.id === cur) return;
-              toast(t('Getting the theme…'));
-              api('/api/theme/set', { id: th.id }).then(
-                function (y) {
-                  if (y.error) toast(t('Could not change the theme'));
-                  else load();
-                },
-                function () {
-                  toast(t('Could not change the theme'));
-                }
-              );
-            },
-          };
-        });
+        items = (x.themes || [])
+          .filter(function (th) {
+            return MENU_THEMES.indexOf(th.id) >= 0;
+          })
+          .map(function (th) {
+            return {
+              label: th.name,
+              sub: th.id === cur ? t('selected') : '',
+              sel: th.id === cur,
+              fn: function () {
+                if (th.id === cur) return;
+                toast(t('Getting the theme…'));
+                api('/api/theme/set', { id: th.id }).then(
+                  function (y) {
+                    if (y.error) toast(t('Could not change the theme'));
+                    else load();
+                  },
+                  function () {
+                    toast(t('Could not change the theme'));
+                  }
+                );
+              },
+            };
+          });
+      items.push({ label: 'LG', sub: t('LG’s own Home'), stay: true, fn: lgHomeMenu });
       items.push({ icon: 'edit', label: t('Customise'), stay: true, fn: customizeMenu });
       openMenu(t('Theme'), items);
-      for (var i = 0; i < items.length; i++) if (items[i].sub) stack[stack.length - 1].idx = i;
+      for (var i = 0; i < items.length; i++) if (items[i].sel) stack[stack.length - 1].idx = i;
       drawMenu();
     },
     function () {

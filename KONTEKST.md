@@ -89,7 +89,7 @@ Radi se na računalu, a TV služi za konačnu provjeru.
 | Warm | Smeđa i jantarna |
 | Bloom | Cvjetna pozadina, traka u staklenom panelu dolje |
 | Horizon | Krajolik u sumrak, 7 aplikacija dolje, sat gore lijevo |
-| **Sidebar** (naša) | Traka lijevo (kućica, HDMI ulazi, postavke), gore desno samo gumb *Tema*, jedan red od 5 većih aplikacija dolje (prvo streaming aplikacije s TV-a); strelica dolje pokaže još dva reda |
+| **Sidebar** (naša) | Traka lijevo (kućica, antena za TV program, radio, HDMI ulazi, postavke, tema), gore desno gumb *Mode*, jedan red od 5 većih aplikacija dolje (prvo streaming aplikacije s TV-a); strelica dolje pokaže još dva reda |
 
 Slike: `docs/screenshots/themes-1.jpg` do `themes-5.jpg`.
 

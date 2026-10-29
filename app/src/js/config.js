@@ -91,8 +91,13 @@ function act(e) {
   var o = e._o || {};
   if (o.action === 'customize') return customizeMenu();
   if (o.action === 'theme') return themeMenu();
+  if (o.action === 'radio') return radioMenu();
+  if (o.action === 'mode') return modeMenu();
   if (o.action === 'home') return railLeave(1, 0);
-  if (o.action === 'live') return LIVE.enter();
+  if (o.action === 'live') {
+    radioStop();
+    return LIVE.enter();
+  }
   if (o.action === 'inputs') return inputsMenu();
   if (o.app) launch(o.app, o.params);
 }

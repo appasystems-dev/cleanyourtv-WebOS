@@ -34,7 +34,7 @@ folder of the GitHub repository (the `main` branch):
 | Still | No animation and a quiet glow. |
 | Bloom | A flower wallpaper with the dock in a glass panel at the bottom. Down moves the dock up and the apps appear below it, centred. |
 | Horizon | A row of seven square apps along the bottom of a dusk landscape, the clock on the left and the buttons on the right at the top. Down moves the row up and shows all apps below it. |
-| Sidebar | A strip on the left with Home, Inputs and Settings, only a Theme button at the top right, and one row of apps at the bottom. Down shows two more rows with the other apps. The Theme button lists the themes and Customise. |
+| Sidebar | A strip on the left with Home, Antenna TV, Radio, Inputs, Settings and Theme, a Mode button at the top right, five large apps at the bottom. Down shows two more rows. With [trailers](launcher.md#trailers) on, a popular film or series fills the screen behind it. |
 
 ![Classic, Compact, Large print and Midnight](screenshots/themes-1.jpg)
 

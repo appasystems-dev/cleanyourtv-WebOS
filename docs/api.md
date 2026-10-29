@@ -17,6 +17,9 @@ you can call it from a shell on the TV (for example over SSH).
 | `GET /api/voice/status`, `POST /api/voice/install`, `/uninstall`, `/set`, `/listen`, `/ask`, `/forget`, `/ha-test`, `/ha-agents` | Optional voice function and AI chat |
 | `GET /api/theme/list`, `POST /api/theme/set`, `/revert` | Themes for the home screen; see [Themes](themes.md) |
 | `GET /api/trailers/status`, `/api/trailers/for?title=&region=&lang=`, `/api/trailers/player?v=&vol=`; `POST /api/trailers/set`, `/pair`, `/pair-stop` | Optional trailers on the home screen; see [Trailers](launcher.md#trailers) |
+| `GET /api/radio/stations?country=` | Radio stations of a country (Radio Browser), playable streams only |
+| `GET /api/photos/list`, `/api/photos/file/<name>`; `POST /api/photos/pair`, `/pair-stop`, `/delete` `{name}`, `/clear` | Your photos for Mode > My photos, sent from a phone (port 8792) |
+| `GET /api/ambient/photos`, `POST /api/ambient/screen-off` | The Mode screens: pictures of the day (Wikimedia Commons), the panel off with the sound kept |
 | `GET /api/live/status`, `/api/live/channels`, `/api/live/epg` | Live TV data |
 | `POST /api/live/settings`, `/api/live/refresh`, `/api/live/reset` | Live TV setup |
 | `GET /api/manager/status` | Versions, updates, options, hook state |

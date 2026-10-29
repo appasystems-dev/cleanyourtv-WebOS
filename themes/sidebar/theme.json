@@ -1,73 +1,74 @@
 {
- "name": "Sidebar",
- "author": "CleanYourTV",
- "description": "A strip on the left with Home, Inputs and Settings, only a Theme button at the top right, and one row of apps at the bottom. Down shows two more rows with the other apps.",
- "colors": {
-  "night": "#08121c",
-  "panel": "#0c1a26",
-  "ink": "#ffffff",
-  "accent": "#ffffff"
- },
- "surface": {
-  "pillAlpha": 0.14,
-  "pillRing": 0.18
- },
- "clock": {
-  "show": false
- },
- "bar": {
-  "style": "pill",
-  "anchor": "top",
-  "align": "right",
-  "x": 72,
-  "y": 54,
-  "size": 60,
-  "gap": 14
- },
- "rail": {
-  "show": true,
-  "width": 136,
-  "size": 76,
-  "gap": 34,
-  "panel": 0.55
- },
- "shelf": {
-  "show": false
- },
- "dock": {
-  "anchor": "bottom",
-  "align": "left",
-  "x": 200,
-  "y": 72,
-  "count": 5,
-  "w": 290,
-  "h": 200,
-  "gap": 40,
-  "radius": 28,
-  "lift": 6,
-  "focusScale": 1.08
- },
- "grid": {
-  "mode": "push",
-  "dockUp": 300,
-  "clipTop": 0,
-  "cols": 5,
-  "x": 200,
-  "width": 1614,
-  "tileH": 200,
-  "gapX": 40,
-  "gapY": 60,
-  "radius": 28,
-  "align": "left"
- },
- "tile": {
-  "border": 0.08,
-  "ringWidth": 3,
-  "ringOffset": 4
- },
- "effects": {
-  "glow": 0,
-  "wallpaper": "sidebar.jpg",
-  "wallpaperDim": 0.1
- }
+  "name": "Sidebar",
+  "author": "CleanYourTV",
+  "description": "A strip on the left with Home, Antenna TV, Radio, Inputs, Settings and Theme, a Mode button at the top right, five large apps at the bottom.",
+  "colors": {
+    "night": "#06080c",
+    "panel": "#0d1118",
+    "ink": "#ffffff",
+    "accent": "#ffffff"
+  },
+  "surface": {
+    "pillAlpha": 0.14,
+    "pillRing": 0.18
+  },
+  "clock": {
+    "show": false
+  },
+  "bar": {
+    "style": "pill",
+    "anchor": "top",
+    "align": "right",
+    "x": 72,
+    "y": 54,
+    "size": 60,
+    "gap": 14
+  },
+  "rail": {
+    "show": true,
+    "width": 136,
+    "size": 76,
+    "gap": 34,
+    "panel": 0.3
+  },
+  "shelf": {
+    "show": false,
+    "y": 300
+  },
+  "dock": {
+    "anchor": "bottom",
+    "align": "left",
+    "x": 200,
+    "y": 72,
+    "count": 5,
+    "w": 290,
+    "h": 200,
+    "gap": 40,
+    "radius": 28,
+    "lift": 6,
+    "focusScale": 1.08
+  },
+  "grid": {
+    "mode": "push",
+    "dockUp": 300,
+    "clipTop": 0,
+    "cols": 5,
+    "x": 200,
+    "width": 1614,
+    "tileH": 200,
+    "gapX": 40,
+    "gapY": 60,
+    "radius": 28,
+    "align": "left"
+  },
+  "tile": {
+    "border": 0.08,
+    "ringWidth": 3,
+    "ringOffset": 4
+  },
+  "effects": {
+    "glow": 0,
+    "wallpaper": "sidebar.jpg",
+    "wallpaperDim": 0.45
+  }
 }

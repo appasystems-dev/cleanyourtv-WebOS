@@ -37,14 +37,20 @@ function rebuild() {
     fit(t, false);
     return t;
   });
-  /* with the strip on the left (theme rail.show) the top bar has only the Theme button; Live TV is among the apps, so it is left off the strip */
+  /* with the strip on the left (theme rail.show): Home, Antenna TV, Radio, your buttons and Theme on the strip (Live TV is among the
+     apps, so it is left off), and only the Mode button in the top bar */
   railEls = TH.rail
-    ? [{ label: 'Home', icon: 'home', action: 'home', fixed: true }]
+    ? [
+        { label: 'Home', icon: 'home', action: 'home', fixed: true },
+        { label: 'Antenna TV', icon: 'antenna', app: 'com.webos.app.livetv', fixed: true },
+        { label: 'Radio', icon: 'radio', action: 'radio', fixed: true },
+      ]
         .concat(
           shownBar().filter(function (o) {
             return o.action !== 'live';
           })
         )
+        .concat([{ label: 'Theme', icon: 'theme', action: 'theme', fixed: true }])
         .map(function (o) {
           var b = document.createElement('div');
           b.className = 'rb';
@@ -57,7 +63,7 @@ function rebuild() {
     : [];
   var tb = (
     TH.rail
-      ? [{ label: 'Theme', icon: 'theme', action: 'theme', fixed: true }]
+      ? [{ label: 'Mode', icon: 'mode', action: 'mode', fixed: true }]
       : shownBar().concat([{ label: 'Customise', icon: 'edit', action: 'customize', fixed: true }])
   ).map(function (o) {
     var p = document.createElement('div');

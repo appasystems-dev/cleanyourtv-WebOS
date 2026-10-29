@@ -156,22 +156,246 @@ body {
   top: 0;
   width: 1920px;
   height: 1080px;
-  background: linear-gradient(to top, rgba(var(--night-rgb), 0.9), rgba(var(--night-rgb), 0) 50%),
-    linear-gradient(to right, rgba(var(--night-rgb), 0.55), rgba(var(--night-rgb), 0) 35%);
+  background: linear-gradient(to top, rgba(var(--night-rgb), 0.92), rgba(var(--night-rgb), 0) 45%),
+    linear-gradient(to right, rgba(var(--night-rgb), 0.85), rgba(var(--night-rgb), 0.35) 40%, rgba(var(--night-rgb), 0) 65%);
 }
-#trl-cap {
+/* the title and its description take the place of the app name: from the grid's left edge, at the name's height (shelf.y) */
+#trl-txt {
   position: absolute;
-  right: 96px;
-  top: 140px;
+  left: var(--grid-l);
+  top: var(--name-y);
   z-index: 1;
-  max-width: 900px;
-  font-size: calc(30px * var(--fs));
-  font-weight: 600;
-  text-align: right;
+  width: 860px;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
+}
+#trl-t {
+  font-size: calc(68px * var(--fs));
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+#trl-o {
+  margin-top: 20px;
+  font-size: calc(28px * var(--fs));
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.86);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+#shelf {
+  transition: opacity calc(0.3s * var(--spd)) ease;
+}
+.hero #shelf {
+  opacity: 0;
+}
+/* an app without films (YouTube): its logo, large, in the middle above the apps */
+#trl-logo {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 200px;
+  width: 340px;
+  height: 340px;
+  margin-left: -170px;
+  z-index: 1;
+  border-radius: 48px;
+  object-fit: contain;
+}
+#trl.logo #trl-logo {
+  display: block;
+}
+#trl.logo #trl-txt {
+  display: none;
+}
+
+/* the Mode screens: above everything, any key ends them */
+#mode {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  z-index: 80;
+  background: #000;
+  overflow: hidden;
+}
+#mode .mph {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity calc(2s * var(--spd)) ease;
+}
+#mode .mph.on {
+  opacity: 1;
+}
+/* your own photos: whole, on black; a photo the phone held upright is turned (older TV browsers ignore the EXIF orientation) */
+#mode.mine .mph {
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+#mode.mine .mph.side {
+  left: 420px;
+  top: -420px;
+  width: 1080px;
+  height: 1920px;
+}
+/* the evening light: a warm base, three soft lights drifting, and a dark layer whose opacity sets how much light the room gets */
+#mode .lb0,
+#mode .ldim {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+}
+#mode .ldim {
+  background: #000;
+  transition: opacity calc(0.6s * var(--spd)) ease;
+}
+#mode.light .blob {
+  opacity: 0.85;
+}
+#mode .lhint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 60px;
+  text-align: center;
+  font-size: 26px;
+  color: rgba(255, 255, 255, 0.75);
+  transition: opacity calc(1s * var(--spd)) ease;
+}
+#mode .lhint.gone {
+  opacity: 0;
+}
+#mode .mclk.small .mt {
+  font-size: 64px;
+  color: rgba(255, 255, 255, 0.4);
+}
+#mode .mclk.small .md {
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.3);
+}
+#mode .mcap {
+  position: absolute;
+  left: 60px;
+  bottom: 36px;
+  max-width: 1500px;
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.7);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+}
+#mode .mclk {
+  position: absolute;
+  left: 200px;
+  top: 200px;
+  transition: transform calc(3s * var(--spd)) ease;
+}
+#mode .mt {
+  font-size: 150px;
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.82);
+}
+#mode .md {
+  margin-top: 12px;
+  font-size: 40px;
+  color: rgba(255, 255, 255, 0.55);
+}
+#mode .blob {
+  position: absolute;
+  width: 1100px;
+  height: 1100px;
+  border-radius: 50%;
+  opacity: 0.55;
+  will-change: transform;
+}
+#mode .b1 {
+  left: -200px;
+  top: -300px;
+  background: radial-gradient(closest-side, rgba(40, 90, 160, 0.9), rgba(40, 90, 160, 0));
+  animation: drift1 calc(60s / var(--spd)) ease-in-out infinite alternate;
+}
+#mode .b2 {
+  left: 900px;
+  top: 200px;
+  background: radial-gradient(closest-side, rgba(150, 60, 120, 0.8), rgba(150, 60, 120, 0));
+  animation: drift2 calc(75s / var(--spd)) ease-in-out infinite alternate;
+}
+#mode .b3 {
+  left: 300px;
+  top: 500px;
+  background: radial-gradient(closest-side, rgba(30, 140, 120, 0.7), rgba(30, 140, 120, 0));
+  animation: drift1 calc(90s / var(--spd)) ease-in-out infinite alternate-reverse;
+}
+@keyframes drift1 {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(500px, 250px) scale(1.25);
+  }
+}
+@keyframes drift2 {
+  from {
+    transform: translate(0, 0) scale(1.1);
+  }
+  to {
+    transform: translate(-600px, -200px) scale(0.9);
+  }
+}
+
+/* naming an input: the TV's keyboard comes up for the field */
+#ren {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  z-index: 70;
+  background: var(--menu-bg);
+}
+#ren .panel {
+  position: absolute;
+  left: 560px;
+  top: 220px;
+  width: 800px;
+}
+#ren h2 {
+  margin: 0 0 30px;
+  font-size: calc(44px * var(--fs));
+}
+#ren input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 22px 28px;
+  font: inherit;
+  font-size: calc(40px * var(--fs));
+  color: var(--ink);
+  background: var(--panel2);
+  border: 3px solid var(--focus);
+  border-radius: var(--row-r);
+  outline: none;
+}
+#ren p {
+  margin-top: 24px;
+  font-size: calc(24px * var(--fs));
+  color: var(--ink2);
 }
 
 #top {

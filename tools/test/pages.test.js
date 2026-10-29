@@ -96,7 +96,7 @@ run(async () => {
     "the favourite star is styled as svg.st, so the menu's .st text keeps its natural width"
   );
 
-  // LG's Home from the launcher: the last row of Customise, behind a confirmation whose first (focused) row is Cancel
+  // LG's Home from the launcher: the last row of Customise, behind a confirmation whose first (focused) row is No; Yes needs OK held 5 s
   const calls = [],
     opened = [];
   const sb = vm.createContext({
@@ -104,6 +104,13 @@ run(async () => {
     cfg: {},
     t: k => k,
     toast() {},
+    setTimeout,
+    clearTimeout,
+    setInterval,
+    clearInterval,
+    Date,
+    Math,
+    trailerStop() {},
     api: (p, b) => (calls.push([p, b]), Promise.resolve({ returnValue: true })),
   });
   vm.runInContext(fs.readFileSync(path.join(root, 'app', 'src', 'js', 'menus.js'), 'utf8'), sb);
@@ -112,11 +119,68 @@ run(async () => {
   const lg = opened[0].items[opened[0].items.length - 1];
   lg.fn();
   const confirm = opened[1];
-  const cancelled = confirm.items[0].label === 'Cancel' && confirm.items[0].fn === sb.backMenu && calls.length === 0;
-  confirm.items[1].fn();
+  const no = confirm.items[0].label === 'No' && confirm.items[0].fn === sb.closeMenus && calls.length === 0;
+  const yes = confirm.items[1];
+  sb.drawMenu = () => {};
+  sb.stack = [{ items: confirm.items, idx: 1 }];
+  const fiveS = yes.hold === 5000;
+  yes.hold = 60;
+  sb.menuKey(13);
+  await new Promise(res => setTimeout(res, 20));
+  sb.holdEnd();
+  await new Promise(res => setTimeout(res, 80));
+  const early = calls.length === 0;
+  sb.stack = [{ items: confirm.items, idx: 1 }];
+  sb.menuKey(13);
+  await new Promise(res => setTimeout(res, 100));
   ok(
-    lg.label === 'LG’s Home' && lg.stay && cancelled && calls.length === 1 && calls[0][0] === '/api/undo' && !!calls[0][1],
-    "Customise ends with LG's Home; its confirmation starts with Cancel and only Yes posts /api/undo"
+    lg.label === 'LG’s Home' && lg.stay && no && fiveS && early && calls.length === 1 && calls[0][0] === '/api/undo' && !!calls[0][1],
+    "Customise ends with LG's Home; its confirmation starts with No, which closes it, and Yes posts /api/undo only after OK is held 5 s"
+  );
+
+  // naming an input on the TV: OK in the field saves the name for that input; an empty name brings LG's back
+  const field = { value: '', listeners: {}, addEventListener: (n, f) => (field.listeners[n] = f), focus() {} };
+  const dlg = { innerHTML: '', parentNode: null, querySelector: s => (s === 'input' ? field : { textContent: '' }) };
+  let saved = 0,
+    toastMsg = '';
+  sb.document = { createElement: () => dlg, body: { appendChild: w => (w.parentNode = { removeChild() {} }) } };
+  sb.saveCfg = () => saved++;
+  sb.toast = m => (toastMsg = m);
+  sb.cfg = { inputNames: { 'com.webos.app.hdmi1': 'TV box' } };
+  sb.renameInput({ appId: 'com.webos.app.hdmi3', label: 'HDMI 3', port: 3 });
+  const renamingOn = sb.renaming === true;
+  field.value = '  PS5 ';
+  field.listeners.keydown({ keyCode: 13, preventDefault() {} });
+  const named = JSON.stringify(sb.cfg.inputNames) === '{"com.webos.app.hdmi1":"TV box","com.webos.app.hdmi3":"PS5"}' && saved === 1;
+  sb.renameInput({ appId: 'com.webos.app.hdmi3', label: 'PS5', lgLabel: 'HDMI 3', port: 3 });
+  const prefilled = field.value === 'PS5';
+  field.value = '';
+  field.listeners.keydown({ keyCode: 13, preventDefault() {} });
+  ok(
+    renamingOn &&
+      named &&
+      prefilled &&
+      JSON.stringify(sb.cfg.inputNames) === '{"com.webos.app.hdmi1":"TV box"}' &&
+      saved === 2 &&
+      !sb.renaming,
+    'an input is named on the TV: OK saves the name typed for it (others kept); an empty name brings back LG’s'
+  );
+  sb.toast = () => {};
+
+  // the evening light: Up and Down set how bright (within its steps), Left and Right the colour; it is remembered; other screens keep no keys
+  const store = {};
+  const msb = vm.createContext({ localStorage: { getItem: k => store[k] || null, setItem: (k, v) => (store[k] = v) }, Math, JSON, String });
+  vm.runInContext(fs.readFileSync(path.join(root, 'app', 'src', 'js', 'modes.js'), 'utf8'), msb);
+  vm.runInContext("modeKind = 'light'", msb);
+  for (let i = 0; i < 9; i++) msb.modeKey(38);
+  const top = msb.light.d === 4;
+  for (let i = 0; i < 9; i++) msb.modeKey(40);
+  msb.modeKey(37);
+  const kept = JSON.parse(store['cytv.light']);
+  vm.runInContext("modeKind = 'slides'", msb);
+  ok(
+    top && msb.light.d === 0 && msb.light.c === 3 && kept.c === 3 && kept.d === 0 && msb.modeKey(38) === false && msb.modeKey(13) === false,
+    'the evening light: Up and Down set how bright within its steps, Left and Right the colour, remembered; other Mode screens end on any key'
   );
 
   // the Theme button (themes with the strip on the left): the themes with the current one marked, Customise last; a pick sets it
@@ -135,31 +199,35 @@ run(async () => {
             themes: [
               { id: 'classic', name: 'Classic' },
               { id: 'sidebar', name: 'Sidebar' },
+              { id: 'warm', name: 'Warm' },
             ],
           }
         : {}
     )
   );
   sb.openMenu = (title, items) => (opened.push({ title, items }), sb.stack.push({ items, idx: 0 }));
+  sb.MENU_THEMES = ['sidebar', 'warm'];
   sb.themeMenu();
   await new Promise(res => setTimeout(res, 0));
   const tm = opened[0],
     tlast = tm.items[tm.items.length - 1];
-  tm.items[1].fn();
   tm.items[0].fn();
+  tm.items[1].fn();
   await new Promise(res => setTimeout(res, 0));
   ok(
     tm.title === 'Theme' &&
-      tm.items[1].sub === 'selected' &&
-      sb.stack[0].idx === 1 &&
+      tm.items.map(x => x.label).join(',') === 'Sidebar,Warm,LG,Customise' &&
+      tm.items[0].sub === 'selected' &&
+      sb.stack[0].idx === 0 &&
+      tm.items[2].fn === sb.lgHomeMenu &&
       tlast.label === 'Customise' &&
       tlast.stay &&
       tlast.fn === sb.customizeMenu &&
       calls.length === 2 &&
       calls[1][0] === '/api/theme/set' &&
-      calls[1][1].id === 'classic' &&
+      calls[1][1].id === 'warm' &&
       loads === 1,
-    'the Theme menu marks the current theme, ends with Customise, and a pick sets the theme and reloads the page'
+    'the Theme menu offers only this TV’s themes and LG (behind its confirmation), marks the current one, ends with Customise; a pick sets it'
   );
 
   // the strip on the left: Left from the first app goes to it, Up and Down move along it, Right goes back to the same app
@@ -196,6 +264,11 @@ run(async () => {
     glowSoon() {},
     trailerFocus() {},
     trailerStop() {},
+    radioStop() {},
+    holdEnd() {},
+    renaming: false,
+    modeOn: () => false,
+    modeExit() {},
     TH: { push: null, overlay: false, rail: true, tileH: 150, gapY: 60, gt: 350, viewH: 780 },
     r: 1,
     c: 0,
@@ -271,35 +344,53 @@ run(async () => {
     };
   const tsb = vm.createContext({
     window: { addEventListener() {} },
-    document: { createElement: () => Object.assign(el(), { setAttribute() {}, contentWindow: {} }) },
+    document: { body: el(), createElement: () => Object.assign(el(), { setAttribute() {}, contentWindow: {} }) },
     setTimeout,
     clearTimeout,
     Date,
     API: 'http://127.0.0.1:8765',
     LOC: 'hr-HR',
+    radioOn: () => false,
+    STREAMING: [/^netflix/i, /^youtube/i],
     cfg: { trailers: { enabled: true, volume: 15 } },
     TH: { push: { up: 400 }, overlay: false },
     r: 1,
     $: id => tels[id] || (tels[id] = box()),
-    api: p => (tcalls.push(p), Promise.resolve({ items: [{ title: 'Film A', year: '2025', video: 'trail_hr_10', backdrop: '' }] })),
+    api: p => (
+      tcalls.push(p),
+      Promise.resolve({
+        items: [{ title: 'Film A', year: '2025', overview: 'About A.', video: 'trail_hr_10', backdrop: 'https://x/a.jpg' }],
+      })
+    ),
   });
   vm.runInContext(fs.readFileSync(path.join(root, 'app', 'src', 'js', 'trailers.js'), 'utf8'), tsb);
-  vm.runInContext('TRL_WAIT = 20', tsb);
+  vm.runInContext('HERO_WAIT = 10; TRL_WAIT = 120', tsb);
   const nfx = { _a: { id: 'netflix', title: 'Netflix' } };
   tsb.trailerFocus(nfx);
-  await new Promise(res => setTimeout(res, 60));
+  await new Promise(res => setTimeout(res, 50));
+  const picture =
+    tcalls.length === 1 &&
+    tcalls[0] === '/api/trailers/for?title=Netflix&region=HR&lang=hr-HR' &&
+    tels.trl.classList.contains('on') &&
+    tsb.document.body.classList.contains('hero') &&
+    tels['trl-t'].textContent === 'Film A (2025)' &&
+    tels['trl-o'].textContent === 'About A.' &&
+    tels['trl-bd'].style.backgroundImage === 'url("https://x/a.jpg")' &&
+    tels.trl.children.length === 0;
+  await new Promise(res => setTimeout(res, 120));
   const frame = tels.trl.children[0];
   ok(
-    tcalls.length === 1 &&
-      tcalls[0] === '/api/trailers/for?title=Netflix&region=HR&lang=hr-HR' &&
-      !!frame &&
-      frame.src === 'http://127.0.0.1:8765/api/trailers/player?v=trail_hr_10&vol=15' &&
-      tels.trl.classList.contains('on') &&
-      tels['trl-cap'].textContent === 'Film A (2025)',
-    'resting on Netflix asks for its trailers with the TV country and language and plays one quietly behind Home'
+    picture && !!frame && frame.src === 'http://127.0.0.1:8765/api/trailers/player?v=trail_hr_10&vol=15',
+    'resting on Netflix shows a popular title at once (picture, title, description; asked with the TV country and language), and its trailer, quietly, only when the wait has passed'
   );
   tsb.trailerStop();
-  ok(tels.trl.children.length === 0 && frame.src === 'about:blank' && !tels.trl.classList.contains('on'), 'stopping removes the player');
+  ok(
+    tels.trl.children.length === 0 &&
+      frame.src === 'about:blank' &&
+      !tels.trl.classList.contains('on') &&
+      !tsb.document.body.classList.contains('hero'),
+    'stopping removes the player and the picture'
+  );
   tsb.r = 2;
   tsb.trailerFocus({ _a: { id: 'other', title: 'Disney+' } });
   tsb.r = 1;
@@ -312,4 +403,21 @@ run(async () => {
     tcalls.length === 1 && tels.trl.children.length === 0,
     'nothing plays from an opened grid, when the focus moves on before the wait, or when trailers are off'
   );
+  ok(
+    tels.trl.classList.contains('on') && tels.trl.classList.contains('logo') && /\/icon\/netflix$/.test(tels['trl-logo'].src),
+    'with trailers off a streaming app shows its own logo, large'
+  );
+  tsb.trailerStop();
+  tsb.cfg.trailers.enabled = true;
+  tsb.api = p => (tcalls.push(p), Promise.resolve({ items: [] }));
+  tsb.trailerFocus({ _a: { id: 'youtube.leanback.v4', title: 'YouTube' } });
+  await new Promise(res => setTimeout(res, 160));
+  ok(
+    tels.trl.classList.contains('logo') && tels.trl.children.length === 0 && /youtube\.leanback\.v4$/.test(tels['trl-logo'].src),
+    'YouTube (no films from TMDB) shows its logo and plays nothing'
+  );
+  tsb.trailerStop();
+  tsb.trailerFocus({ _a: { id: 'com.lg.smartdoctor', title: 'Smart Doctor' } });
+  await new Promise(res => setTimeout(res, 40));
+  ok(!tels.trl.classList.contains('on'), 'an app that is not a streaming service shows nothing behind Home');
 });

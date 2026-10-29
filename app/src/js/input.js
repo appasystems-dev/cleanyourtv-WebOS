@@ -58,6 +58,12 @@ document.addEventListener('mousemove', function (ev) {
 document.addEventListener('keydown', function (e) {
   var k = e.keyCode;
   lastKey = Date.now();
+  if (renaming) return; /* the name field has the keys */
+  if (modeOn()) {
+    if (!modeKey(k)) modeExit();
+    e.preventDefault();
+    return;
+  } /* any key ends a Mode screen, except the ones it uses itself */
   if (LIVE.on) {
     LIVE.key(e);
     return;
@@ -132,7 +138,8 @@ document.addEventListener('keydown', function (e) {
   e.preventDefault();
 });
 document.addEventListener('keyup', function (e) {
-  if (e.keyCode !== 13) return;
+  if (e.keyCode !== 13 || renaming) return;
+  holdEnd();
   lastKey = Date.now();
   clearTimeout(downT);
   var pr = document.querySelector('.press');
@@ -176,6 +183,7 @@ document.addEventListener('webOSRelaunch', function () {
 document.addEventListener('visibilitychange', function () {
   if (document.hidden) {
     trailerStop();
+    radioStop();
     if (LIVE.on) LIVE.exit();
     closeRunningMenu();
   } else load();

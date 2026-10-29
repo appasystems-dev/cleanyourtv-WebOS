@@ -61,6 +61,9 @@ const manager = load('manager', () => require('./manager').create(ctx));
 load('apps', () => require('./apps').create(ctx));
 load('running', () => require('./running').create(ctx));
 load('trailers', () => require('./trailers').create(ctx));
+load('radio', () => require('./radio').create(ctx));
+load('ambient', () => require('./ambient').create(ctx));
+load('photos', () => require('./photos').create(ctx));
 
 require('./server')
   .create({ features: () => loaded })
