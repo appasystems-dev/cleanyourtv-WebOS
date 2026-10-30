@@ -90,6 +90,9 @@ The clock moves now and then, so nothing stays in one place on the screen.
 
 The dock holds four apps, or as many as the theme sets (`dock.count`). Hold OK on an app and choose **Add to dock**, **Move left**, **Move right** or **Remove from dock**.
 
+An input can be a dock tile too, beside the apps: put its app id (`com.webos.app.hdmi3` for HDMI 3) in `dock`. It opens that input, under
+the name given to it on the TV when there is one. Inputs are not in the grid, so an input removed from the dock goes back to the Inputs list only.
+
 ## Trailers
 
 Optional, off until you set it up in the manager app (**Trailers**). When the focus comes to Netflix, Disney+, Prime Video, Max,
@@ -146,7 +149,7 @@ Settings are stored on the TV in `/media/developer/cleanyourtv/config.json`:
 
 | Key | Meaning |
 |---|---|
-| `dock` | App ids in the dock (up to the theme's `dock.count`). Missing: the streaming apps on the TV. |
+| `dock` | App ids in the dock (up to the theme's `dock.count`), inputs too (`com.webos.app.hdmi3`). Missing: the streaming apps on the TV. |
 | `topbar` | The buttons at the top. |
 | `hidden` | App ids you hid. |
 | `sort` | `usage` or `alpha`. |

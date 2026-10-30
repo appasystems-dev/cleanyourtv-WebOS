@@ -13,6 +13,8 @@ run(async () => {
         apps: [
           { id: 'a.one', title, folderPath: '/x', icon: 'i.png' },
           { id: 'com.webos.app.home', title: 'Home' },
+          { id: 'com.webos.app.hdmi3', title: 'HDMI3', folderPath: '/y', icon: 'h.png', visible: false },
+          { id: 'a.hidden', title: 'Hidden', folderPath: '/z', icon: 'i.png', visible: false },
         ],
       };
     }
@@ -55,5 +57,21 @@ run(async () => {
   ok(
     JSON.stringify(r.j.config.inputNames) === JSON.stringify({ 'com.webos.app.hdmi3': 'PS5 console' }) && r.j.config.dock[0] === 'a.one',
     'the names are saved tidied (spaces, bad ids and empty names dropped) and come back to the launcher'
+  );
+  ok(
+    !r.j.apps.some(a => a.id === 'com.webos.app.hdmi3' || a.id === 'a.hidden'),
+    'an input that is not in the dock and a hidden app are not in the launcher’s list'
+  );
+
+  // an input in the dock (HDMI 3 beside Netflix): in the list, under the name given on the TV, opened like an app
+  await call(apps, '/api/config', 'POST', {
+    dock: ['a.one', 'com.webos.app.hdmi3'],
+    inputNames: { 'com.webos.app.hdmi3': 'PS5 console' },
+  });
+  r = await call(apps, '/api/apps');
+  const h3 = r.j.apps.find(a => a.id === 'com.webos.app.hdmi3');
+  ok(
+    r.j.apps.length === 2 && h3 && h3.input === true && h3.title === 'PS5 console' && r.j.config.dock[1] === 'com.webos.app.hdmi3',
+    'HDMI 3 in the dock is in the launcher’s list, named as on the TV; other hidden apps stay out'
   );
 });

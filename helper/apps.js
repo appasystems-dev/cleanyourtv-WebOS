@@ -10,6 +10,8 @@ const P = require('./paths'),
 
 const HALF_LIFE = 30 * 24 * 3600 * 1000; // usage counts halve every 30 days
 const HOME = 'com.webos.app.home';
+// the inputs' apps (HDMI 3 is com.webos.app.hdmi3): hidden in LG's app list, shown to the launcher only when they are in the dock
+const INPUT = /^com\.webos\.app\.(hdmi\d+|externalinput\.[\w-]+)$/;
 
 function create(ctx) {
   const { config, luna } = ctx;
@@ -26,8 +28,12 @@ function create(ctx) {
         asking = null;
         if (!Array.isArray(r.apps)) return appCache || [];
         appCache = r.apps
-          .filter(a => a.visible !== false && a.id !== HOME)
-          .map(a => ({ id: a.id, title: a.title, icon: a.largeIcon || a.icon, folder: a.folderPath, type: a.type }));
+          .filter(a => a.id !== HOME && (a.visible !== false || INPUT.test(a.id)))
+          .map(a => {
+            const o = { id: a.id, title: a.title, icon: a.largeIcon || a.icon, folder: a.folderPath, type: a.type };
+            if (INPUT.test(a.id)) o.input = true;
+            return o;
+          });
         appCacheAt = Date.now();
         return appCache;
       });
@@ -37,6 +43,16 @@ function create(ctx) {
     if (!appCache) return askApps();
     if (Date.now() - appCacheAt > 5000) askApps();
     return appCache;
+  }
+  // the list the launcher gets: an input only when it is in the dock (an input tile in the grid would be noise), under the name
+  // given to it on the TV (inputNames) when there is one
+  function launcherApps(list) {
+    const c = config.get(),
+      dock = Array.isArray(c.dock) ? c.dock : [],
+      names = c.inputNames || {};
+    return list
+      .filter(a => !a.input || dock.indexOf(a.id) >= 0)
+      .map(a => (a.input && names[a.id] ? Object.assign({}, a, { title: names[a.id] }) : a));
   }
 
   // ---- usage: which apps get used (foreground changes), with a 30-day half-life ----
@@ -152,7 +168,7 @@ function create(ctx) {
 
   async function handle(req, res, u, body) {
     if (u === '/api/apps')
-      return web.json(res, { apps: await apps(), config: launcherConfig(), usage: usageScores(), version: ctx.version });
+      return web.json(res, { apps: launcherApps(await apps()), config: launcherConfig(), usage: usageScores(), version: ctx.version });
     if (u === '/api/inputs') {
       // a name given on the TV replaces LG's; LG's own stays in lgLabel
       const r = await luna('luna://com.webos.service.eim/getAllInputStatus', {}),
