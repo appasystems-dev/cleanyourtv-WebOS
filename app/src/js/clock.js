@@ -406,7 +406,7 @@ var TX = {
     'Delete my photos': 'Obriši moje slike',
     'Your photos are deleted': 'Vaše slike su obrisane',
     'Up and Down: brighter or darker · Left and Right: colour · other keys: back':
-      'Gore i dolje: jače ili slabije · lijevo i desno: boja · ostale tipke: natrag',
+      'Gore i dolje: svjetlina · lijevo i desno: boja · ostale tipke: natrag',
     'No photos now: the evening light instead': 'Trenutno nema slika: umjesto njih večernje svjetlo',
     'The photo page could not be opened': 'Stranica za slike se nije mogla otvoriti',
     'type it in the phone’s browser (same Wi-Fi)': 'upišite je u preglednik na mobitelu (ista Wi-Fi mreža)',

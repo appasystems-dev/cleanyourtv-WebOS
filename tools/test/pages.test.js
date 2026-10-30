@@ -182,6 +182,18 @@ run(async () => {
     'the evening light: Up and Down set how bright within its steps, Left and Right the colour, remembered; other Mode screens end on any key'
   );
 
+  // half an hour on Home with nobody at the remote turns the evening light on; not sooner, not over an app, a menu or Live TV, not twice
+  vm.runInContext('var lit = 0; modeLight = function () { lit++; modeEl = {}; }; modeEl = null; idleFrom = 1000;', msb);
+  const half = 30 * 60 * 1000;
+  const idleEarly = msb.modeIdle(1000 + half - 1, false),
+    idleBusy = msb.modeIdle(1000 + half, true),
+    idleOn = msb.modeIdle(1000 + half, false),
+    idleAgain = msb.modeIdle(1000 + 2 * half, false);
+  ok(
+    !idleEarly && !idleBusy && idleOn && !idleAgain && msb.lit === 1,
+    'idle on Home for 30 minutes: the evening light comes on by itself, not sooner, not while something else is open, and only once'
+  );
+
   // the Theme button (themes with the strip on the left): the themes with the current one marked, Customise last; a pick sets it
   calls.length = 0;
   opened.length = 0;

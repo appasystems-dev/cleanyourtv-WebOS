@@ -1,7 +1,7 @@
 /* ---------- Mode (the button at the top right): what the TV shows while nobody watches. Evening light that lights the room softly, your
    own photos (sent from a phone), photos of the day, a black screen, or the screen off with the sound kept. The radio goes on; any key
    comes back to Home (in the evening light the arrows set it). Only transform and opacity move (the GPU is weak), and a clock moves now
-   and then so nothing stays in one place. ---------- */
+   and then so nothing stays in one place (the evening light's dim clock stays in the middle; its lights drift). ---------- */
 var modeEl = null,
   modeAt = 0,
   modeT = 0,
@@ -98,6 +98,27 @@ function modeKey(k) {
     localStorage.setItem('cytv.light', JSON.stringify(light));
   } catch (e) {}
   lightPaint();
+  lightHint();
+  return true;
+}
+/* the evening light's key hint: shown when it starts and on every key it uses, gone after HINT_IDLE without one */
+var HINT_IDLE = 150 * 1000;
+function lightHint() {
+  var h = modeEl && modeEl.querySelector('.lhint');
+  if (!h) return;
+  h.classList.remove('gone');
+  clearTimeout(modeT);
+  modeT = setTimeout(function () {
+    h.classList.add('gone');
+  }, HINT_IDLE);
+}
+/* nobody touched the remote for half an hour while Home is on screen (no app, menu, Live TV or Mode screen): the evening light comes on
+   by itself. input.js moves idleFrom on every key, pointer move and return to Home, and asks every half minute. */
+var IDLE_LIGHT = 30 * 60 * 1000,
+  idleFrom = 0;
+function modeIdle(now, busy) {
+  if (modeEl || busy || !idleFrom || now - idleFrom < IDLE_LIGHT) return false;
+  modeLight();
   return true;
 }
 function modeClock(w, small) {
@@ -114,8 +135,8 @@ function modeClock(w, small) {
       } catch (e) {
         c.firstChild.textContent = ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
       }
-      /* a new place every few minutes, within the screen */
-      if (n++ % 12 === 0)
+      /* a new place every few minutes, within the screen; the evening light's dim clock stays in the middle */
+      if (!small && n++ % 12 === 0)
         c.style.transform = 'translate(' + Math.round(Math.random() * 1100) + 'px,' + Math.round(Math.random() * 640) + 'px)';
     };
   draw();
@@ -129,10 +150,7 @@ function modeLight() {
   w.querySelector('.lhint').textContent = t('Up and Down: brighter or darker · Left and Right: colour · other keys: back');
   modeClock(w, true);
   lightPaint();
-  modeT = setTimeout(function () {
-    var h = w.querySelector('.lhint');
-    if (h) h.classList.add('gone');
-  }, 7000);
+  lightHint();
 }
 function lightPaint() {
   if (!modeEl || modeKind !== 'light') return;

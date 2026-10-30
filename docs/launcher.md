@@ -75,8 +75,10 @@ stations' own internet streams (MP3 or AAC). While the radio plays, trailers sho
 **Mode** (top right with the strip) is for when nobody watches. Any key comes back to Home.
 
 - **Evening light** lights the room softly, so the TV can be the only light: a warm base with three soft lights drifting slowly, and a
-  small clock. Up and Down make it brighter or darker (five steps; it starts dim), Left and Right change the colour (warm, candle,
-  rose, sea). The choice is remembered.
+  dim clock in the middle of the screen, in a rounded face. Up and Down make it brighter or darker (five steps; it starts dim), Left and
+  Right change the colour (warm, candle, rose, sea). The choice is remembered. The key hint at the bottom goes after two and a half
+  minutes without a key and comes back with the next arrow. It also comes on by itself after **30 minutes on Home** with nobody at the
+  remote: not while an app, a menu or Live TV is open.
 - **My photos**: your own photos, whole, each for 15 seconds, turned the way the phone held them. **Add photos...** opens
   a page on the home network for 15 minutes at a short address shown on the TV (`http://<tv>:8792/<6 digits>`); type it in the
   phone's browser on the same Wi-Fi, choose photos, and they are sent. JPEG, PNG or WebP (an iPhone sends its photos as JPEG), at
@@ -86,7 +88,7 @@ stations' own internet streams (MP3 or AAC). While the radio plays, trailers sho
 - **Black screen**, and **Screen off**, which switches the panel off and keeps the sound (the radio). On an LCD TV the black screen
   still has its backlight on; Screen off is darker.
 
-The clock moves now and then, so nothing stays in one place on the screen.
+The clock of the other screens moves now and then, so nothing stays in one place on the screen.
 
 The dock holds four apps, or as many as the theme sets (`dock.count`). Hold OK on an app and choose **Add to dock**, **Move left**, **Move right** or **Remove from dock**.
 

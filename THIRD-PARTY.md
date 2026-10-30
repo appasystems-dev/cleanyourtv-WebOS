@@ -43,6 +43,15 @@ Kazuhiko Arase, unmodified (npm package `qrcode-generator@1.4.4`, SHA-256 of the
 `18ae399f81182bc9de916e9c77b195df20cc58d6f2d55a62b085a299f1bf1780`), licensed under the MIT license (the notice is in
 the file header). The manager app loads it to draw the QR code.
 
+## Nunito (the clock of the evening light)
+
+`app/src/css/clockfont.css` embeds a subset of [Nunito](https://github.com/googlefonts/nunito) 3.602 by The Nunito Project
+Authors, licensed under the SIL Open Font License 1.1 (`third-party/nunito/OFL.txt`, in the package as
+`licenses/LICENSE-nunito-OFL-1.1.txt`). It is made from `ofl/nunito/Nunito[wght].ttf` of [google/fonts](https://github.com/google/fonts)
+(SHA-256 `bb55a5ca5c2042335b3991af27c4d0705d0ef41cac6164ac737fd8f2a1e85207`) with fontTools: the weight fixed at 600
+(`fontTools.varLib.instancer wght=600`), then only the digits, `:`, `.`, space, `A M P a m p`, U+00A0 and U+202F kept, without
+hinting, as WOFF (`fontTools.subset`). The font declares no Reserved Font Name; the page names it "CYTV Clock".
+
 ## Design
 
 The home-screen design follows the Android TV project [CleanYourTV](https://github.com/Gathin23/cleanyourtv) (MIT).

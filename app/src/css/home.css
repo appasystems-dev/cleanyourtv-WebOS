@@ -283,14 +283,30 @@ body {
   bottom: 60px;
   text-align: center;
   font-size: 26px;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.45);
   transition: opacity calc(1s * var(--spd)) ease;
 }
 #mode .lhint.gone {
   opacity: 0;
 }
+/* the evening light's clock: in the middle of the screen, still, in a rounded face (clockfont.css) */
+#mode .mclk.small {
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
 #mode .mclk.small .mt {
-  font-size: 64px;
+  font-family: "CYTV Clock", var(--font);
+  font-weight: 600;
+  font-size: 97px;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
   color: rgba(255, 255, 255, 0.4);
 }
 #mode .mclk.small .md {

@@ -45,6 +45,7 @@ document.addEventListener('mousemove', function (ev) {
     return;
   }
   if (Math.abs(ev.clientX - lastMX) + Math.abs(ev.clientY - lastMY) < 24) return;
+  idleFrom = Date.now();
   lastMX = ev.clientX;
   lastMY = ev.clientY;
   var el = ev.target.closest ? ev.target.closest('.tile,.pill,.rb') : null,
@@ -57,7 +58,7 @@ document.addEventListener('mousemove', function (ev) {
 
 document.addEventListener('keydown', function (e) {
   var k = e.keyCode;
-  lastKey = Date.now();
+  lastKey = idleFrom = Date.now();
   if (renaming) return; /* the name field has the keys */
   if (modeOn()) {
     if (!modeKey(k)) modeExit();
@@ -168,6 +169,7 @@ function wantInputs() {
   }
 }
 document.addEventListener('webOSRelaunch', function () {
+  idleFrom = Date.now();
   var p = {};
   try {
     p = JSON.parse(webOSSystem.launchParams || '{}');
@@ -186,8 +188,16 @@ document.addEventListener('visibilitychange', function () {
     radioStop();
     if (LIVE.on) LIVE.exit();
     closeRunningMenu();
-  } else load();
+  } else {
+    idleFrom = Date.now();
+    load();
+  }
 });
+/* half an hour on Home with nobody at the remote: the evening light (modes.js) */
+idleFrom = Date.now();
+setInterval(function () {
+  modeIdle(Date.now(), document.hidden || stack.length > 0 || LIVE.on || renaming);
+}, 30000);
 
 function tick() {
   var d = new Date();
