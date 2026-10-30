@@ -98,7 +98,8 @@ the name given to it on the TV when there is one. Inputs are not in the grid, so
 Optional, off until you set it up in the manager app (**Trailers**). When the focus comes to Netflix, Disney+, Prime Video, Max,
 SkyShowtime or Apple TV, something popular on that service in your country fills the screen behind Home: its picture, its title with
 the year and a short description, on the left where the app name would be (`grid.x`, `shelf.y` of the theme). Two seconds after the
-focus arrived its trailer starts over the picture, quietly (the volume is set in the manager: muted, 15, 30 or 50 %). Moving the focus,
+focus arrived its trailer starts over the picture, quietly (the volume is set in the manager: muted, 15, 30 or 50 %). Once it plays, the
+title and the description go, the shade over the video lightens and the apps move down a little, out of its way. Moving the focus,
 opening an app or a menu, or leaving Home stops it at once, and the player is removed, so the app you open has the TV's video to itself.
 
 YouTube, and every streaming app TMDB has no films for (Pickbox, HRTi, RTL Play, ...), shows its own logo, large, and plays nothing;

@@ -163,6 +163,12 @@ body {
   height: 1080px;
   background: linear-gradient(to top, rgba(var(--night-rgb), 0.92), rgba(var(--night-rgb), 0) 45%),
     linear-gradient(to right, rgba(var(--night-rgb), 0.85), rgba(var(--night-rgb), 0.35) 40%, rgba(var(--night-rgb), 0) 65%);
+  transition: opacity calc(0.8s * var(--spd)) ease;
+  will-change: opacity;
+}
+/* while the video plays (trailers.js adds .play): the title and the description go and the shade lightens, so the video is seen */
+#trl.play::after {
+  opacity: 0.4;
 }
 /* the title and its description take the place of the app name: from the grid's left edge, at the name's height (shelf.y) */
 #trl-txt {
@@ -172,6 +178,10 @@ body {
   z-index: 1;
   width: 860px;
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
+  transition: opacity calc(0.5s * var(--spd)) ease;
+}
+#trl.play #trl-txt {
+  opacity: 0;
 }
 #trl-t {
   font-size: calc(68px * var(--fs));
@@ -572,6 +582,11 @@ body {
   height: calc(1080px - var(--view-top));
   overflow: hidden;
   z-index: 2;
+  transition: transform calc(0.6s * var(--spd)) ease;
+}
+/* while a trailer plays the apps move down a little, out of the video's way; they come back when the focus moves */
+.trl-play #view {
+  transform: translateY(120px);
 }
 #scroll {
   position: absolute;
@@ -3744,13 +3759,23 @@ function trailerStop() {
     w.classList.remove('on');
     w.classList.remove('logo');
   }
+  trailerPlaying(false);
   document.body.classList.remove('hero');
+}
+/* while the video plays: the title and the description go, the shade over the video lightens and the apps move down out of its way */
+function trailerPlaying(on) {
+  var w = $('trl');
+  if (w) w.classList[on ? 'add' : 'remove']('play');
+  document.body.classList[on ? 'add' : 'remove']('trl-play');
 }
 window.addEventListener('message', function (ev) {
   if (!trlFrame || ev.source !== trlFrame.contentWindow) return;
-  if (ev.data === 'cytv-trailer:playing') trlFrame.classList.add('on');
-  else if (ev.data === 'cytv-trailer:error') {
+  if (ev.data === 'cytv-trailer:playing') {
+    trlFrame.classList.add('on');
+    trailerPlaying(true);
+  } else if (ev.data === 'cytv-trailer:error') {
     /* the picture stays, without the video */
+    trailerPlaying(false);
     trlFrame.src = 'about:blank';
     trlFrame.parentNode.removeChild(trlFrame);
     trlFrame = null;

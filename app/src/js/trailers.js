@@ -102,13 +102,23 @@ function trailerStop() {
     w.classList.remove('on');
     w.classList.remove('logo');
   }
+  trailerPlaying(false);
   document.body.classList.remove('hero');
+}
+/* while the video plays: the title and the description go, the shade over the video lightens and the apps move down out of its way */
+function trailerPlaying(on) {
+  var w = $('trl');
+  if (w) w.classList[on ? 'add' : 'remove']('play');
+  document.body.classList[on ? 'add' : 'remove']('trl-play');
 }
 window.addEventListener('message', function (ev) {
   if (!trlFrame || ev.source !== trlFrame.contentWindow) return;
-  if (ev.data === 'cytv-trailer:playing') trlFrame.classList.add('on');
-  else if (ev.data === 'cytv-trailer:error') {
+  if (ev.data === 'cytv-trailer:playing') {
+    trlFrame.classList.add('on');
+    trailerPlaying(true);
+  } else if (ev.data === 'cytv-trailer:error') {
     /* the picture stays, without the video */
+    trailerPlaying(false);
     trlFrame.src = 'about:blank';
     trlFrame.parentNode.removeChild(trlFrame);
     trlFrame = null;
