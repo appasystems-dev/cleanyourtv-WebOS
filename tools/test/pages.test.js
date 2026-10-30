@@ -141,11 +141,10 @@ run(async () => {
   // naming an input on the TV: OK in the field saves the name for that input; an empty name brings LG's back
   const field = { value: '', listeners: {}, addEventListener: (n, f) => (field.listeners[n] = f), focus() {} };
   const dlg = { innerHTML: '', parentNode: null, querySelector: s => (s === 'input' ? field : { textContent: '' }) };
-  let saved = 0,
-    toastMsg = '';
+  let saved = 0;
   sb.document = { createElement: () => dlg, body: { appendChild: w => (w.parentNode = { removeChild() {} }) } };
   sb.saveCfg = () => saved++;
-  sb.toast = m => (toastMsg = m);
+  sb.toast = () => {};
   sb.cfg = { inputNames: { 'com.webos.app.hdmi1': 'TV box' } };
   sb.renameInput({ appId: 'com.webos.app.hdmi3', label: 'HDMI 3', port: 3 });
   const renamingOn = sb.renaming === true;
