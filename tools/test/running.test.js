@@ -70,4 +70,30 @@ run(async () => {
   ok(x.j.returnValue === false && /nothing is running/.test(x.j.errorText), 'nothing to close');
   x = await call(r, '/api/running/close', 'POST', { all: 'yes' });
   ok(x.j.returnValue === false, 'only all: true closes everything');
+
+  // closeIdle: apps left behind for 30 minutes are closed while Home is in front
+  const MIN = 60 * 1000,
+    t0 = 1e12;
+  let fg = 'com.webos.app.home',
+    cfg = {};
+  const last = { netflix: t0 - 40 * MIN, 'youtube.leanback.v4': t0 + 5 * MIN };
+  const appsI = apps.concat([{ id: 'com.webos.app.hdmi3', title: 'HDMI 3', input: true }]);
+  const idle = running.create({
+    luna,
+    config: { get: () => cfg },
+    feature: n => (n === 'apps' ? { apps: async () => appsI, front: () => fg, lastFront: id => last[id] || 0 } : null),
+  });
+  closeByAppIdWorks = true;
+  runningNow = [{ id: 'netflix' }, { id: 'youtube.leanback.v4' }, { id: 'com.webos.app.hdmi3' }, { id: 'com.webos.app.home' }];
+  let c = await idle.closeIdle(t0);
+  ok(c.length === 0, 'an app seen running for the first time is not closed at once, even if it was in front long ago');
+  c = await idle.closeIdle(t0 + 31 * MIN);
+  ok(c.join() === 'netflix', 'after 30 minutes in the background it is closed; one in front since then stays');
+  c = await idle.closeIdle(t0 + 40 * MIN);
+  ok(c.indexOf('youtube.leanback.v4') >= 0 && c.indexOf('com.webos.app.hdmi3') < 0, 'its turn comes too; never an input');
+  fg = 'netflix';
+  ok((await idle.closeIdle(t0 + 90 * MIN)).length === 0, 'nothing is closed while an app is in front');
+  fg = 'com.webos.app.home';
+  cfg = { closeIdle: false };
+  ok((await idle.closeIdle(t0 + 90 * MIN)).length === 0, '"closeIdle": false keeps them open');
 });

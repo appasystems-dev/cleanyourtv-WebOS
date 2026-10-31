@@ -85,7 +85,14 @@ function create(ctx) {
   let cand = null,
     streak = 0,
     counted = null;
+  // the app in front and when each app was last in front (running.js closes the ones left behind for long)
+  let front = '';
+  const lastFront = {};
   async function onForeground(id) {
+    if (id) {
+      front = id;
+      lastFront[id] = Date.now();
+    }
     if (id === HOME) {
       counted = null;
       cand = id;
@@ -205,6 +212,8 @@ function create(ctx) {
     handle,
     start: () => setInterval(pollForeground, 4000),
     apps,
+    front: () => front,
+    lastFront: id => lastFront[id] || 0,
   };
 }
 

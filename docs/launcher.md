@@ -37,7 +37,11 @@ Back on the home screen lists the apps that are open, as LG's Home does with its
 **Close all** closes every app in the list, and Back leaves it. Closing an app also removes it from LG's recent apps.
 
 It lists the apps the launcher knows, including the ones you hid from the grid; Home itself, CleanYourTV's own apps and the TV's
-system apps are never in it. The list is read when it opens and closes when you leave Home. Suggested and first built by
+system apps are never in it. The list is read when it opens and closes when you leave Home.
+
+Apps you leave open are also closed by themselves: while Home is on the screen, an app that has not been in front for **30 minutes** is
+closed (checked once a minute), because a TV with 1 GB of memory gets slow with a few apps open. An input (HDMI) is never closed this way.
+`"closeIdle": false` in the settings file keeps them open. Suggested and first built by
 [Steefzar](https://github.com/lasharor/cleanyourtv-WebOS/issues/16).
 
 ![Running apps](screenshots/running.jpg)
@@ -157,6 +161,7 @@ Settings are stored on the TV in `/media/developer/cleanyourtv/config.json`:
 | `hidden` | App ids you hid. |
 | `sort` | `usage` or `alpha`. |
 | `clock` | `auto`, `12` or `24`. |
+| `closeIdle` | `false`: apps left in the background stay open (by default they are closed after 30 minutes on Home). |
 
 See [`config.example.json`](https://github.com/lasharor/cleanyourtv-WebOS/blob/main/config.example.json). Change settings in
 the launcher; the file is read and written by the service.

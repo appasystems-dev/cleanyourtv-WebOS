@@ -5,11 +5,15 @@
 // Only apps the launcher knows are listed (the apps of listApps), never Home and never CleanYourTV's own apps (the manager, and the
 // picker and notify apps that are meant to stay up). Only listed apps can be closed. Closing also drops the app from LG's recents, as
 // LG's panel does.
+// While Home is in front, an app left in the background for 30 minutes is closed (closeIdle, once a minute): a TV with 1 GB swaps with a
+// few apps open and everything gets slow. Never an input (HDMI) and never the app in front. "closeIdle": false in config.json keeps them.
 const web = require('./web');
 
 const HOME = 'com.webos.app.home',
   OWN = /^com\.cleanyourtv\./,
-  AM = 'luna://com.webos.applicationManager/';
+  AM = 'luna://com.webos.applicationManager/',
+  IDLE = 30 * 60 * 1000,
+  INPUT = /^com\.webos\.app\.(hdmi\d+|externalinput\.[\w-]+)$/;
 
 // running: the list of applicationManager/running; apps: the launcher's apps ({id, title})
 function pick(running, apps) {
@@ -47,6 +51,21 @@ function create(ctx) {
     await luna('luna://com.webos.service.recent/removeRecent', { appId: id }); // not on every webOS; the app is closed either way
     return true;
   }
+  const firstSeen = {}; // an app open before the service started counts from when it was first seen running
+  async function closeIdle(now) {
+    const a = ctx.feature('apps'),
+      cfg = ctx.config ? ctx.config.get() : {};
+    if (cfg.closeIdle === false || !a || !a.front || a.front() !== HOME) return [];
+    const open = (await list()).apps.map(x => x.id),
+      closed = [];
+    for (const id in firstSeen) if (open.indexOf(id) < 0) delete firstSeen[id];
+    for (const id of open) {
+      if (!firstSeen[id]) firstSeen[id] = now;
+      if (INPUT.test(id) || now - Math.max(a.lastFront(id), firstSeen[id]) < IDLE) continue;
+      if (await close(id)) closed.push(id);
+    }
+    return closed;
+  }
   async function handle(req, res, u, body) {
     if (u === '/api/running') return web.json(res, await list());
     if (u === '/api/running/close' && req.method === 'POST') {
@@ -59,7 +78,15 @@ function create(ctx) {
     }
     web.notFound(res);
   }
-  return { name: 'running', paths: ['/api/running', '/api/running/close'], handle, list, close };
+  return {
+    name: 'running',
+    paths: ['/api/running', '/api/running/close'],
+    handle,
+    list,
+    close,
+    closeIdle,
+    start: () => setInterval(() => closeIdle(Date.now()).catch(() => {}), 60000),
+  };
 }
 
 module.exports = { create, pick };
