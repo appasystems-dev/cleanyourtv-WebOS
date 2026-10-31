@@ -5,7 +5,11 @@ L=/media/developer/cleanyourtv
 for s in remotelogger service-logger contentminer nudge; do systemctl stop $s.service 2>&1 | sed "s/^/$s: /"; done
 # luna dynamic services: bind a do-nothing stub over the binary so ls-hubd cannot start them
 printf '#!/bin/sh\nexit 0\n' > $L/stub-noop; chmod +x $L/stub-noop
-for b in acr2 admanager sportsalarm adoverlay-service; do
+# optional, per TV: debloat-extra (names separated by spaces) also stops services of features you do not use; only these can be named
+# (Apple AirPlay and HomeKit, LG ThinQ's IoT client), which debloat-undo.sh also restores
+EXTRA="airplay airplay-adaptor homekit iot-client"
+extra() { [ -r $L/debloat-extra ] && for w in $(cat $L/debloat-extra); do case " $EXTRA " in *" $w "*) echo $w ;; esac; done; }
+for b in acr2 admanager sportsalarm adoverlay-service $(extra); do
   [ -e /usr/sbin/$b ] || continue
   grep -q " /usr/sbin/$b " /proc/mounts || mount --bind $L/stub-noop /usr/sbin/$b
   pkill -9 -f "^/usr/sbin/$b"

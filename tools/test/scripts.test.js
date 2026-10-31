@@ -133,6 +133,20 @@ run(async () => {
     /mount --bind \/tmp\/cleanyourtv-hosts \/etc\/hosts/.test(stop) && /umount \/etc\/hosts/.test(undo),
     'where /etc/hosts is read-only (issue 11) the ad servers go into a copy in RAM, and the undo removes it'
   );
+  // debloat-extra: only the listed services of unused features can be named, and the undo restores every one of them
+  const extraList = (stop.match(/^EXTRA="([^"]*)"/m) || [])[1] || '',
+    extraFn = (stop.match(/^extra\(\) \{.*\}$/m) || [])[0] || '',
+    xdir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'cytv-extra-'));
+  fs.writeFileSync(path.join(xdir, 'debloat-extra'), 'homekit  rm\n../x airplay iot-client;reboot airplay-adaptor\n');
+  const xr = require('child_process').spawnSync('sh', ['-c', 'L="$1"; EXTRA="$2"; ' + extraFn + '; extra', 'sh', xdir, extraList], {
+    encoding: 'utf8',
+  });
+  ok(
+    xr.stdout.trim().split(/\s+/).join() === 'homekit,airplay,airplay-adaptor' &&
+      extraList.split(' ').every(b => new RegExp('for b in [^;]* ' + b + '[ ;]').test(undo)) &&
+      /\$\(extra\)/.test(stop),
+    'debloat-extra stops only the services that may be named (AirPlay, HomeKit, ThinQ IoT); the undo restores them all'
+  );
   ok(
     /TV="node \$S\/helper\/tvprofile\.js"/.test(bootText) &&
       /\$TV get notifyWindow/.test(bootText) &&
