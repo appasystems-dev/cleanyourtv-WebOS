@@ -30,3 +30,5 @@ if ! grep -q "# cleanyourtv-debloat" /etc/hosts; then
       || echo "hosts: /etc/hosts cannot be changed on this TV; the ad servers are not blocked"
   fi
 fi
+# what LG's preloader starts hidden, from preload-add and preload-off on the TV (scripts/preload.sh)
+sh $L/preload.sh

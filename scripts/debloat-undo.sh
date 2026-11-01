@@ -10,3 +10,4 @@ if [ -e /tmp/cleanyourtv-hosts.mounted ]; then umount /etc/hosts 2>/dev/null && 
 if grep -q "# cleanyourtv-debloat" /etc/hosts; then
   grep -v "# cleanyourtv-debloat" /etc/hosts > /tmp/hosts.new && cat /tmp/hosts.new > /etc/hosts; rm -f /tmp/hosts.new
 fi
+sh /media/developer/cleanyourtv/preload.sh undo

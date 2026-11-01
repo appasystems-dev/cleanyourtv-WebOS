@@ -19,6 +19,17 @@ Optionally, per TV, it also keeps services of features you do not use from start
 HomeKit) and `iot-client` (LG ThinQ's smart-home client). Together they take about 15 MB of a 1 GB TV's memory. Screen sharing from
 a Windows PC (Miracast) does not use them. Removing a name takes effect at the next restart or when Debloat is switched off.
 
+It can also change what LG's preloader starts hidden while Home is up, so an app opens at once (`scripts/preload.sh`), with two
+optional files of app ids, separated by spaces:
+
+- `/media/developer/cleanyourtv/preload-add`: apps it should preload too, for example `com.disney.disneyplus-prod`. The preloader's
+  list is a read-only file of LG's settings service (`/etc/configd/layers/base/com.webos.service.preloadmanager.json`); a copy in RAM with
+  these apps added is mounted over it, and the preloader is restarted. LG still decides when: only while memory allows.
+- `/media/developer/cleanyourtv/preload-off`: apps it should not preload, for example `com.webos.app.browser amazon`. A switched-off
+  app still opens, only more slowly the first time.
+
+Both last until the next restart and are applied again at every start; switching Debloat off lifts them.
+
 Nothing is uninstalled. It applies only while the launcher is Home, because LG's own Home needs some of those services to start;
 switching back to LG's Home lifts the debloat first.
 

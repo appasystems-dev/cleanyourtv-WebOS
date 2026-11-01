@@ -19,6 +19,33 @@ run(async () => {
   const opts = function () {
     return cp.spawnSync(process.execPath, [jt, 'options', cfg].concat([].slice.call(arguments)), { encoding: 'utf8' });
   };
+  // preload.sh: LG's preloader list with Disney+ added, as LG lists its own apps; an app already there or a bad id is not added
+  const pl = path.join(tmp, 'preloadmanager.json'),
+    pl2 = path.join(tmp, 'preloadmanager-new.json');
+  fs.writeFileSync(pl, JSON.stringify({ supportAppList: [{ id: 'netflix', isEnabled: false }], other: 1 }));
+  let pr = cp.spawnSync(process.execPath, [jt, 'preloadadd', pl, pl2, 'com.disney.disneyplus-prod', 'netflix', 'a;b'], {
+    encoding: 'utf8',
+  });
+  const plist = pr.status === 0 ? JSON.parse(fs.readFileSync(pl2, 'utf8')) : {};
+  ok(
+    plist.other === 1 &&
+      plist.supportAppList.map(x => x.id).join() === 'netflix,com.disney.disneyplus-prod' &&
+      plist.supportAppList[0].isEnabled === false &&
+      plist.supportAppList[1].preloadMode === 'partial' &&
+      plist.supportAppList[1].isEnabled === true,
+    'preloadadd puts Disney+ on the preloader list and keeps the rest'
+  );
+  pr = cp.spawnSync(process.execPath, [jt, 'preloadadd', pl, path.join(tmp, 'none.json'), 'netflix'], { encoding: 'utf8' });
+  ok(pr.status === 1 && !fs.existsSync(path.join(tmp, 'none.json')), 'nothing to add: no new list, so preload.sh mounts nothing');
+  const preSh = fs.readFileSync(path.join(root, 'scripts', 'preload.sh'), 'utf8');
+  ok(
+    /sh \$L\/preload\.sh$/m.test(fs.readFileSync(path.join(root, 'scripts', 'debloat-stop.sh'), 'utf8')) &&
+      /preload\.sh undo/.test(fs.readFileSync(path.join(root, 'scripts', 'debloat-undo.sh'), 'utf8')) &&
+      /umount \$F/.test(preSh) &&
+      /"permanent\\":false/.test(preSh),
+    'the debloat applies the preload files and its undo lifts them; the policy changes last until the next restart only'
+  );
+
   fs.writeFileSync(cfg, JSON.stringify({ options: { inputKey: false, debloat: false, liveTv: false }, keep: 1 }));
   let r = opts('', '');
   let c = JSON.parse(fs.readFileSync(cfg, 'utf8'));

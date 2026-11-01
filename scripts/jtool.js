@@ -89,7 +89,27 @@ if (cmd === 'kind') {
     });
     fs.writeFileSync(p, JSON.stringify(b));
   }
+} else if (cmd === 'preloadadd') {
+  // preloadadd <src> <dst> <app id>...  ->  LG's preloader list (configd's com.webos.service.preloadmanager.json) with these apps too,
+  // preloaded as LG preloads its own streaming apps (partial, when memory allows); exit 1 when nothing was added
+  var pl = rj(a[1], null),
+    list = pl && pl.supportAppList,
+    added = 0;
+  if (!Array.isArray(list)) process.exit(1);
+  a.slice(3).forEach(function (id) {
+    if (
+      !/^[\w.-]+$/.test(id) ||
+      list.some(function (x) {
+        return x && x.id === id;
+      })
+    )
+      return;
+    list.push({ id: id, staticPriority: 10, requiredMemory: 100, preloadType: 'periodic', preloadMode: 'partial', isEnabled: true });
+    added++;
+  });
+  if (!added) process.exit(1);
+  fs.writeFileSync(a[2], JSON.stringify(pl, null, 4));
 } else {
-  console.error('usage: jtool.js kind|newer|options|opt|stage|wintype|rmbind');
+  console.error('usage: jtool.js kind|newer|options|opt|stage|wintype|rmbind|preloadadd');
   process.exit(2);
 }
