@@ -181,6 +181,16 @@ run(async () => {
     top && msb.light.d === 0 && msb.light.c === 3 && kept.c === 3 && kept.d === 0 && msb.modeKey(38) === false && msb.modeKey(13) === false,
     'the evening light: Up and Down set how bright within its steps, Left and Right the colour, remembered; other Mode screens end on any key'
   );
+  ok(
+    msb.modeEnds(461) &&
+      msb.modeEnds(13) &&
+      msb.modeEnds(38) &&
+      !msb.modeEnds(1536) &&
+      !msb.modeEnds(1537) &&
+      !msb.modeEnds(0) &&
+      !msb.modeEnds(229),
+    'a Mode screen ends on a key pressed, not on the Magic Remote pointer showing or hiding (1536, 1537) or an unknown key'
+  );
 
   // half an hour on Home with nobody at the remote turns the evening light on; not sooner, not over an app, a menu or Live TV, not twice
   vm.runInContext('var lit = 0; modeLight = function () { lit++; modeEl = {}; }; modeEl = null; idleFrom = 1000;', msb);

@@ -61,7 +61,7 @@ document.addEventListener('keydown', function (e) {
   lastKey = idleFrom = Date.now();
   if (renaming) return; /* the name field has the keys */
   if (modeOn()) {
-    if (!modeKey(k)) modeExit();
+    if (!modeKey(k) && modeEnds(k)) modeExit();
     e.preventDefault();
     return;
   } /* any key ends a Mode screen, except the ones it uses itself */

@@ -101,6 +101,13 @@ function modeKey(k) {
   lightHint();
   return true;
 }
+/* whether a key ends a Mode screen: not what webOS sends that nobody pressed as a key, the Magic Remote's pointer showing or hiding (1536,
+   1537, before the first arrow while the pointer is on screen) or an unknown key (0, 229). Each key that is not an arrow goes to the
+   service log ("perf mode key 461"), so a key that ends it by mistake can be found. */
+function modeEnds(k) {
+  if (typeof perfMark === 'function') perfMark('mode key ' + k);
+  return !!k && k !== 229 && k < 1536;
+}
 /* the evening light's key hint: shown when it starts and on every key it uses, gone after HINT_IDLE without one */
 var HINT_IDLE = 150 * 1000;
 function lightHint() {

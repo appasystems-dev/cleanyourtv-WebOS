@@ -80,7 +80,8 @@ stations' own internet streams (MP3 or AAC). While the radio plays, trailers sho
 
 ## Mode
 
-**Mode** (top right with the strip) is for when nobody watches. Any key comes back to Home.
+**Mode** (top right with the strip) is for when nobody watches. Any key comes back to Home (not the Magic Remote's pointer showing
+or hiding, which webOS sends before the first arrow while the pointer is on the screen).
 
 - **Evening light** lights the room softly, so the TV can be the only light: a warm base with three soft lights drifting slowly, and a
   dim clock in the middle of the screen, in a rounded face. Up and Down make it brighter or darker (five steps; it starts dim), Left and
