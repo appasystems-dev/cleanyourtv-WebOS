@@ -38,6 +38,23 @@ run(async () => {
   pr = cp.spawnSync(process.execPath, [jt, 'preloadadd', pl, path.join(tmp, 'none.json'), 'netflix'], { encoding: 'utf8' });
   ok(pr.status === 1 && !fs.existsSync(path.join(tmp, 'none.json')), 'nothing to add: no new list, so preload.sh mounts nothing');
   const preSh = fs.readFileSync(path.join(root, 'scripts', 'preload.sh'), 'utf8');
+  // the lists come from scripts/preload.conf, and a file of the same name on the TV replaces one; only app ids pass
+  const pdir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'cytv-preload-'));
+  fs.copyFileSync(path.join(root, 'scripts', 'preload.conf'), path.join(pdir, 'preload.conf'));
+  fs.writeFileSync(path.join(pdir, 'preload-off'), 'com.webos.app.hdmi1 x;reboot\n');
+  const lists = (preSh.match(/^PRELOAD_ADD=''[\s\S]*?\n}\n/m) || [''])[0],
+    pids = cp
+      .spawnSync(
+        'sh',
+        ['-c', 'L="$1"; ' + lists + 'echo "$(ids preload-add "$PRELOAD_ADD")|$(ids preload-off "$PRELOAD_OFF")"', 'sh', pdir],
+        { encoding: 'utf8' }
+      )
+      .stdout.replace(/\n(?!$)/g, ' ')
+      .trim();
+  ok(
+    pids === 'com.disney.disneyplus-prod netflix|com.webos.app.hdmi1',
+    'preload.conf gives the lists (Disney+ and Netflix added), a file on the TV replaces one, a bad id is dropped: ' + pids
+  );
   ok(
     /sh \$L\/preload\.sh$/m.test(fs.readFileSync(path.join(root, 'scripts', 'debloat-stop.sh'), 'utf8')) &&
       /preload\.sh undo/.test(fs.readFileSync(path.join(root, 'scripts', 'debloat-undo.sh'), 'utf8')) &&

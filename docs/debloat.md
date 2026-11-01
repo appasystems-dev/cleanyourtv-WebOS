@@ -19,17 +19,21 @@ Optionally, per TV, it also keeps services of features you do not use from start
 HomeKit) and `iot-client` (LG ThinQ's smart-home client). Together they take about 15 MB of a 1 GB TV's memory. Screen sharing from
 a Windows PC (Miracast) does not use them. Removing a name takes effect at the next restart or when Debloat is switched off.
 
-It can also change what LG's preloader starts hidden while Home is up, so an app opens at once (`scripts/preload.sh`), with two
-optional files of app ids, separated by spaces:
+It can also change what LG's preloader starts hidden while Home is up, so an app opens at once (`scripts/preload.sh`). The two lists
+are in [`scripts/preload.conf`](https://github.com/appasystems-dev/cleanyourtv-WebOS/blob/launcher-lg-home/scripts/preload.conf),
+the place to edit them, with a comment on each:
 
-- `/media/developer/cleanyourtv/preload-add`: apps it should preload too, for example `com.disney.disneyplus-prod netflix`. The preloader's
-  list is a read-only file of LG's settings service (`/etc/configd/layers/base/com.webos.service.preloadmanager.json`); a copy in RAM with
-  these apps added is mounted over it, and the preloader is restarted; an app already on the list but switched off there (`netflix` on
-some TVs) is switched on. LG still decides when: only while memory allows.
-- `/media/developer/cleanyourtv/preload-off`: apps it should not preload, for example `com.webos.app.browser amazon`. A switched-off
-  app still opens, only more slowly the first time.
+- `PRELOAD_ADD`: apps it should preload too, as shipped `com.disney.disneyplus-prod netflix`. The preloader's list is a read-only file
+  of LG's settings service (`/etc/configd/layers/base/com.webos.service.preloadmanager.json`); a copy in RAM with these apps added is
+  mounted over it, and the preloader is restarted; an app already on the list but switched off there (`netflix` on some TVs) is
+  switched on.
+- `PRELOAD_OFF`: apps it should not preload, as shipped the browser, Amazon, Miracast, the voice app and HDMI 2. A switched-off app or
+  input still opens, only more slowly the first time.
 
-Both last until the next restart and are applied again at every start; switching Debloat off lifts them.
+LG preloads at most five apps, Home and the inputs included, and only while memory allows, so an added app may need another one
+switched off (HDMI 2 here). The lists differ between TVs: a file `preload-add` or `preload-off` in `/media/developer/cleanyourtv` on a
+TV replaces that list for that TV. Both last until the next restart and are applied again at every start; switching Debloat off lifts
+them.
 
 Nothing is uninstalled. It applies only while the launcher is Home, because LG's own Home needs some of those services to start;
 switching back to LG's Home lifts the debloat first.
