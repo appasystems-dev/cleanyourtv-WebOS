@@ -22,9 +22,10 @@ a Windows PC (Miracast) does not use them. Removing a name takes effect at the n
 It can also change what LG's preloader starts hidden while Home is up, so an app opens at once (`scripts/preload.sh`), with two
 optional files of app ids, separated by spaces:
 
-- `/media/developer/cleanyourtv/preload-add`: apps it should preload too, for example `com.disney.disneyplus-prod`. The preloader's
+- `/media/developer/cleanyourtv/preload-add`: apps it should preload too, for example `com.disney.disneyplus-prod netflix`. The preloader's
   list is a read-only file of LG's settings service (`/etc/configd/layers/base/com.webos.service.preloadmanager.json`); a copy in RAM with
-  these apps added is mounted over it, and the preloader is restarted. LG still decides when: only while memory allows.
+  these apps added is mounted over it, and the preloader is restarted; an app already on the list but switched off there (`netflix` on
+some TVs) is switched on. LG still decides when: only while memory allows.
 - `/media/developer/cleanyourtv/preload-off`: apps it should not preload, for example `com.webos.app.browser amazon`. A switched-off
   app still opens, only more slowly the first time.
 

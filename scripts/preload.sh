@@ -1,7 +1,8 @@
 #!/bin/sh
 # LG's preloader (webos-preload-manager) starts some apps hidden while Home is up, so they open at once. Two optional files on the TV
 # change what it starts, in RAM until the next restart (run by debloat-stop.sh; "preload.sh undo" by debloat-undo.sh):
-#   preload-add   app ids it should preload too (its list is a read-only configd file: a copy with them is mounted over it)
+#   preload-add   app ids it should preload too (its list is a read-only configd file: a copy with them is mounted over it; one
+#                 already there but switched off is switched on)
 #   preload-off   app ids it should not preload
 export PATH=/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 L=/media/developer/cleanyourtv
@@ -26,4 +27,6 @@ ADD=$(ids preload-add)
 if [ -n "$ADD" ] && [ -e $F ] && ! grep -q " $F " /proc/mounts; then
   node $L/jtool.js preloadadd $F $T $ADD && mount --bind $T $F && reload
 fi
+# an app already on LG's list but switched off there (Netflix on some TVs, which the restart above also closes) is switched on
+for id in $ADD; do policy $id true; done
 for id in $(ids preload-off); do policy $id false; done

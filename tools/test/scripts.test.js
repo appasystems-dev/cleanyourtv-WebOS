@@ -42,8 +42,9 @@ run(async () => {
     /sh \$L\/preload\.sh$/m.test(fs.readFileSync(path.join(root, 'scripts', 'debloat-stop.sh'), 'utf8')) &&
       /preload\.sh undo/.test(fs.readFileSync(path.join(root, 'scripts', 'debloat-undo.sh'), 'utf8')) &&
       /umount \$F/.test(preSh) &&
+      /for id in \$ADD; do policy \$id true; done/.test(preSh) &&
       /"permanent\\":false/.test(preSh),
-    'the debloat applies the preload files and its undo lifts them; the policy changes last until the next restart only'
+    'the debloat applies the preload files (an added app LG switched off is switched on) and its undo lifts them; until the next restart only'
   );
 
   fs.writeFileSync(cfg, JSON.stringify({ options: { inputKey: false, debloat: false, liveTv: false }, keep: 1 }));
