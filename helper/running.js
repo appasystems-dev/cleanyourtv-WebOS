@@ -6,13 +6,17 @@
 // picker and notify apps that are meant to stay up). Only listed apps can be closed. Closing also drops the app from LG's recents, as
 // LG's panel does.
 // While Home is in front, an app left in the background for 30 minutes is closed (closeIdle, once a minute): a TV with 1 GB swaps with a
-// few apps open and everything gets slow. Never an input (HDMI) and never the app in front. "closeIdle": false in config.json keeps them.
+// few apps open and everything gets slow. An app that has not been in front since it was seen running (LG starts YouTube, Netflix and its
+// browser by itself after a start, "preload") is closed after 2 minutes, whatever is in front, at most three times an hour each, so a TV
+// that keeps starting it again is left alone. Never an input (HDMI) and never the app in front. "closeIdle": false keeps them all.
 const web = require('./web');
 
 const HOME = 'com.webos.app.home',
   OWN = /^com\.cleanyourtv\./,
   AM = 'luna://com.webos.applicationManager/',
   IDLE = 30 * 60 * 1000,
+  PRELOAD = 2 * 60 * 1000,
+  HOUR = 3600 * 1000,
   INPUT = /^com\.webos\.app\.(hdmi\d+|externalinput\.[\w-]+)$/;
 
 // running: the list of applicationManager/running; apps: the launcher's apps ({id, title})
@@ -51,18 +55,26 @@ function create(ctx) {
     await luna('luna://com.webos.service.recent/removeRecent', { appId: id }); // not on every webOS; the app is closed either way
     return true;
   }
-  const firstSeen = {}; // an app open before the service started counts from when it was first seen running
+  const firstSeen = {}, // an app open before the service started counts from when it was first seen running
+    preClosed = {}; // when each app was last closed as preloaded
   async function closeIdle(now) {
     const a = ctx.feature('apps'),
       cfg = ctx.config ? ctx.config.get() : {};
-    if (cfg.closeIdle === false || !a || !a.front || a.front() !== HOME) return [];
-    const open = (await list()).apps.map(x => x.id),
+    if (cfg.closeIdle === false || !a || !a.front) return [];
+    const front = a.front(),
+      open = (await list()).apps.map(x => x.id),
       closed = [];
     for (const id in firstSeen) if (open.indexOf(id) < 0) delete firstSeen[id];
     for (const id of open) {
       if (!firstSeen[id]) firstSeen[id] = now;
-      if (INPUT.test(id) || now - Math.max(a.lastFront(id), firstSeen[id]) < IDLE) continue;
-      if (await close(id)) closed.push(id);
+      if (INPUT.test(id) || id === front) continue;
+      const last = a.lastFront(id),
+        preloaded = last < firstSeen[id],
+        recent = (preClosed[id] || []).filter(t => now - t < HOUR);
+      if (preloaded ? now - firstSeen[id] < PRELOAD || recent.length >= 3 : front !== HOME || now - last < IDLE) continue;
+      if (!(await close(id))) continue;
+      closed.push(id);
+      if (preloaded) preClosed[id] = recent.concat(now);
     }
     return closed;
   }

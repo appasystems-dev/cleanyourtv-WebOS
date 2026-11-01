@@ -96,4 +96,31 @@ run(async () => {
   fg = 'com.webos.app.home';
   cfg = { closeIdle: false };
   ok((await idle.closeIdle(t0 + 90 * MIN)).length === 0, '"closeIdle": false keeps them open');
+
+  // an app LG started by itself (never in front since it was seen running) goes after 2 minutes, whatever is in front, three times an hour
+  cfg = {};
+  fg = 'com.webos.app.hdmi3';
+  const last2 = {};
+  const pre = running.create({
+    luna,
+    config: { get: () => cfg },
+    feature: n => (n === 'apps' ? { apps: async () => appsI, front: () => fg, lastFront: id => last2[id] || 0 } : null),
+  });
+  runningNow = [{ id: 'netflix' }, { id: 'com.webos.app.hdmi3' }];
+  ok((await pre.closeIdle(t0)).length === 0 && (await pre.closeIdle(t0 + MIN)).length === 0, 'a preloaded app is left for 2 minutes');
+  ok((await pre.closeIdle(t0 + 2 * MIN)).join() === 'netflix', 'then it is closed, also while an input is in front');
+  let t = t0 + 2 * MIN,
+    again = 0;
+  for (let i = 0; i < 4; i++) {
+    runningNow = [{ id: 'com.webos.app.hdmi3' }];
+    await pre.closeIdle((t += MIN));
+    runningNow = [{ id: 'netflix' }, { id: 'com.webos.app.hdmi3' }];
+    await pre.closeIdle((t += MIN));
+    again += (await pre.closeIdle((t += 2 * MIN))).length;
+  }
+  ok(again === 2, 'started again and again by the TV, it is closed three times an hour and then left alone');
+  runningNow = [{ id: 'youtube.leanback.v4' }];
+  await pre.closeIdle(t0 + 100 * MIN);
+  last2['youtube.leanback.v4'] = t0 + 101 * MIN;
+  ok((await pre.closeIdle(t0 + 110 * MIN)).length === 0, 'an app you opened is not a preloaded one: it waits the 30 minutes on Home');
 });
