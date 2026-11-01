@@ -8,7 +8,9 @@
 // While Home is in front, an app left in the background for 30 minutes is closed (closeIdle, once a minute): a TV with 1 GB swaps with a
 // few apps open and everything gets slow. An app that has not been in front since it was seen running (LG starts YouTube, Netflix and its
 // browser by itself after a start, "preload") is closed after 2 minutes, whatever is in front, at most three times an hour each, so a TV
-// that keeps starting it again is left alone. Never an input (HDMI) and never the app in front. "closeIdle": false keeps them all.
+// that keeps starting it again is left alone. The streaming apps of KEEP ("keepApps" in config.json) are the exception, so they open at
+// once from Home: they stay open, preloaded or not, while Home is in front, and go 15 minutes after another app or an input came to the
+// front (three times an hour at most, too). Never an input (HDMI) and never the app in front. "closeIdle": false keeps them all.
 const web = require('./web');
 
 const HOME = 'com.webos.app.home',
@@ -17,6 +19,8 @@ const HOME = 'com.webos.app.home',
   IDLE = 30 * 60 * 1000,
   PRELOAD = 2 * 60 * 1000,
   HOUR = 3600 * 1000,
+  AWAY = 15 * 60 * 1000,
+  KEEP = ['youtube.leanback.v4', 'netflix', 'com.disney.disneyplus-prod'],
   INPUT = /^com\.webos\.app\.(hdmi\d+|externalinput\.[\w-]+)$/;
 
 // running: the list of applicationManager/running; apps: the launcher's apps ({id, title})
@@ -56,25 +60,37 @@ function create(ctx) {
     return true;
   }
   const firstSeen = {}, // an app open before the service started counts from when it was first seen running
-    preClosed = {}; // when each app was last closed as preloaded
+    preClosed = {}; // when each app was last closed as preloaded or kept
+  let awaySince = 0; // since when something other than Home is in front
   async function closeIdle(now) {
     const a = ctx.feature('apps'),
       cfg = ctx.config ? ctx.config.get() : {};
     if (cfg.closeIdle === false || !a || !a.front) return [];
     const front = a.front(),
+      keep = Array.isArray(cfg.keepApps) ? cfg.keepApps : KEEP,
       open = (await list()).apps.map(x => x.id),
       closed = [];
+    if (front === HOME) awaySince = 0;
+    else if (!awaySince) awaySince = now;
     for (const id in firstSeen) if (open.indexOf(id) < 0) delete firstSeen[id];
     for (const id of open) {
       if (!firstSeen[id]) firstSeen[id] = now;
       if (INPUT.test(id) || id === front) continue;
       const last = a.lastFront(id),
-        preloaded = last < firstSeen[id],
+        kept = keep.indexOf(id) >= 0,
+        preloaded = !kept && last < firstSeen[id],
         recent = (preClosed[id] || []).filter(t => now - t < HOUR);
-      if (preloaded ? now - firstSeen[id] < PRELOAD || recent.length >= 3 : front !== HOME || now - last < IDLE) continue;
+      if (
+        kept
+          ? !awaySince || now - awaySince < AWAY || recent.length >= 3
+          : preloaded
+            ? now - firstSeen[id] < PRELOAD || recent.length >= 3
+            : front !== HOME || now - last < IDLE
+      )
+        continue;
       if (!(await close(id))) continue;
       closed.push(id);
-      if (preloaded) preClosed[id] = recent.concat(now);
+      if (kept || preloaded) preClosed[id] = recent.concat(now);
     }
     return closed;
   }

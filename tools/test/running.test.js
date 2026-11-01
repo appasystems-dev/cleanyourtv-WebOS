@@ -75,7 +75,7 @@ run(async () => {
   const MIN = 60 * 1000,
     t0 = 1e12;
   let fg = 'com.webos.app.home',
-    cfg = {};
+    cfg = { keepApps: [] };
   const last = { netflix: t0 - 40 * MIN, 'youtube.leanback.v4': t0 + 5 * MIN };
   const appsI = apps.concat([{ id: 'com.webos.app.hdmi3', title: 'HDMI 3', input: true }]);
   const idle = running.create({
@@ -98,7 +98,7 @@ run(async () => {
   ok((await idle.closeIdle(t0 + 90 * MIN)).length === 0, '"closeIdle": false keeps them open');
 
   // an app LG started by itself (never in front since it was seen running) goes after 2 minutes, whatever is in front, three times an hour
-  cfg = {};
+  cfg = { keepApps: [] };
   fg = 'com.webos.app.hdmi3';
   const last2 = {};
   const pre = running.create({
@@ -123,4 +123,27 @@ run(async () => {
   await pre.closeIdle(t0 + 100 * MIN);
   last2['youtube.leanback.v4'] = t0 + 101 * MIN;
   ok((await pre.closeIdle(t0 + 110 * MIN)).length === 0, 'an app you opened is not a preloaded one: it waits the 30 minutes on Home');
+
+  // YouTube, Netflix and Disney+ stay open on Home, and go 15 minutes after another app or an input came to the front
+  cfg = {};
+  fg = 'com.webos.app.home';
+  const keep = running.create({
+    luna,
+    config: { get: () => cfg },
+    feature: n => (n === 'apps' ? { apps: async () => appsI, front: () => fg, lastFront: () => 0 } : null),
+  });
+  runningNow = [{ id: 'netflix' }, { id: 'youtube.leanback.v4' }, { id: 'com.webos.app.hdmi3' }];
+  ok((await keep.closeIdle(t0)).length === 0 && (await keep.closeIdle(t0 + 120 * MIN)).length === 0, 'kept open on Home, for hours');
+  fg = 'com.webos.app.hdmi3';
+  ok(
+    (await keep.closeIdle(t0 + 121 * MIN)).length === 0 && (await keep.closeIdle(t0 + 135 * MIN)).length === 0,
+    'an input in front: not before 15 minutes'
+  );
+  ok((await keep.closeIdle(t0 + 136 * MIN)).join() === 'netflix,youtube.leanback.v4', 'then both go');
+  runningNow = [{ id: 'netflix' }, { id: 'youtube.leanback.v4' }];
+  fg = 'com.webos.app.home';
+  await keep.closeIdle(t0 + 140 * MIN);
+  fg = 'netflix';
+  await keep.closeIdle(t0 + 141 * MIN);
+  ok((await keep.closeIdle(t0 + 156 * MIN)).join() === 'youtube.leanback.v4', 'Netflix in front stays; YouTube goes after 15 minutes');
 });
