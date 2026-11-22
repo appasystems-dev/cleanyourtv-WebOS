@@ -291,6 +291,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
       'manager',
       'apps',
       'running',
+      'debloat', // sets LG's preload policy again after the TV was switched off and on
       'trailers',
       'radio',
       'ambient',
