@@ -23,7 +23,9 @@ It can also change what LG's preloader starts hidden while Home is up, so an app
 are in [`scripts/preload.conf`](https://github.com/appasystems-dev/cleanyourtv-WebOS/blob/launcher-lg-home/scripts/preload.conf),
 the place to edit them, with a comment on each:
 
-- `PRELOAD_ADD`: apps it should preload too, as shipped `com.disney.disneyplus-prod netflix`. The preloader's list is a read-only file
+- `PRELOAD_ADD`: apps it should preload too, as shipped `netflix`. Disney+ (`com.disney.disneyplus-prod`) can be added, but on a
+  webOS 5 TV it stayed on a grey screen when it was opened while the preloader was still starting it, seconds after the TV was
+  switched on, so it is left out. The preloader's list is a read-only file
   of LG's settings service (`/etc/configd/layers/base/com.webos.service.preloadmanager.json`); a copy in RAM with these apps added is
   mounted over it, and the preloader is restarted; an app already on the list but switched off there (`netflix` on some TVs) is
   switched on.
@@ -31,7 +33,7 @@ the place to edit them, with a comment on each:
   input still opens, only more slowly the first time.
 
 LG preloads at most five apps, Home and the inputs included, and only while memory allows, so an added app may need another one
-switched off (HDMI 2 here). The lists differ between TVs: a file `preload-add` or `preload-off` in `/media/developer/cleanyourtv` on a
+switched off (as shipped HDMI 2 is, on a TV where it has cameras). The lists differ between TVs: a file `preload-add` or `preload-off` in `/media/developer/cleanyourtv` on a
 TV replaces that list for that TV. Both last until the next restart and are applied again at every start; switching Debloat off lifts
 them.
 

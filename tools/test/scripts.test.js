@@ -52,8 +52,8 @@ run(async () => {
       .stdout.replace(/\n(?!$)/g, ' ')
       .trim();
   ok(
-    pids === 'com.disney.disneyplus-prod netflix|com.webos.app.hdmi1',
-    'preload.conf gives the lists (Disney+ and Netflix added), a file on the TV replaces one, a bad id is dropped: ' + pids
+    pids === 'netflix|com.webos.app.hdmi1',
+    'preload.conf gives the lists (Netflix added), a file on the TV replaces one, a bad id is dropped: ' + pids
   );
   ok(
     /sh \$L\/preload\.sh$/m.test(fs.readFileSync(path.join(root, 'scripts', 'debloat-stop.sh'), 'utf8')) &&
