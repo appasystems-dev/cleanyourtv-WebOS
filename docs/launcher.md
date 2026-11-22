@@ -43,9 +43,11 @@ Apps you leave open are also closed by themselves: while Home is on the screen, 
 closed (checked once a minute), because a TV with 1 GB of memory gets slow with a few apps open. LG also starts some apps by itself,
 hidden, after the TV is switched on (YouTube, Netflix, its browser: "preload"); an app that has not been in front since it was seen
 running is closed after **2 minutes**, whatever is on the screen, at most three times an hour each, so one the TV keeps starting again is
-left alone. YouTube, Netflix and Disney+ are the exception, so they open at once from Home: they stay open, started by LG or by you,
+left alone. YouTube and Netflix are the exception, so they open at once from Home: they stay open, started by LG or by you,
 while Home is on the screen, and are closed **15 minutes** after another app or an input came to the screen (`keepApps` in the settings
-file lists them; `[]` treats them like the others). An input (HDMI) and the app on the screen are never closed this way. `"closeIdle": false` in the settings file keeps them open. Suggested and first built by
+file lists them; `[]` treats them like the others). Disney+ is always started anew from the launcher, because on a webOS 5 TV it stays
+on a grey screen when it comes back from the background: opening it closes it first if it is open, and YouTube too, so it has the
+memory to start in; Netflix keeps its 15 minutes (`freshApps` and `freshCloses` in the settings file). An input (HDMI) and the app on the screen are never closed this way. `"closeIdle": false` in the settings file keeps them open. Suggested and first built by
 [Steefzar](https://github.com/lasharor/cleanyourtv-WebOS/issues/16).
 
 ![Running apps](screenshots/running.jpg)
@@ -166,7 +168,9 @@ Settings are stored on the TV in `/media/developer/cleanyourtv/config.json`:
 | `hidden` | App ids you hid. |
 | `sort` | `usage` or `alpha`. |
 | `clock` | `auto`, `12` or `24`. |
-| `keepApps` | Apps kept open while Home is on the screen and closed 15 minutes after another app came to it. Missing: YouTube, Netflix, Disney+. |
+| `keepApps` | Apps kept open while Home is on the screen and closed 15 minutes after another app came to it. Missing: YouTube, Netflix. |
+| `freshApps` | Apps the launcher always starts anew, closing them first if they are open. Missing: Disney+. `[]`: none. |
+| `freshCloses` | Apps closed when one of `freshApps` is opened, to give it memory. Missing: YouTube. |
 | `closeIdle` | `false`: apps left in the background stay open (by default they are closed after 30 minutes on Home, and apps LG started by itself after 2 minutes). |
 
 See [`config.example.json`](https://github.com/lasharor/cleanyourtv-WebOS/blob/main/config.example.json). Change settings in

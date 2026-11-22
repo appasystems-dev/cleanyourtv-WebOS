@@ -11,6 +11,9 @@
 // that keeps starting it again is left alone. The streaming apps of KEEP ("keepApps" in config.json) are the exception, so they open at
 // once from Home: they stay open, preloaded or not, while Home is in front, and go 15 minutes after another app or an input came to the
 // front (three times an hour at most, too). Never an input (HDMI) and never the app in front. "closeIdle": false keeps them all.
+// An app of FRESH ("freshApps") is always started anew from the launcher: Disney+ on a webOS 5 TV stays on a grey screen when it comes
+// back from the background (left with Home, or preloaded hidden). Opening it closes it first if it is open, and the apps of FREE
+// ("freshCloses", YouTube) too, so it has the memory to start in; Netflix keeps its 15 minutes (beforeLaunch, called by apps.js).
 const web = require('./web');
 
 const HOME = 'com.webos.app.home',
@@ -20,7 +23,10 @@ const HOME = 'com.webos.app.home',
   PRELOAD = 2 * 60 * 1000,
   HOUR = 3600 * 1000,
   AWAY = 15 * 60 * 1000,
-  KEEP = ['youtube.leanback.v4', 'netflix', 'com.disney.disneyplus-prod'],
+  KEEP = ['youtube.leanback.v4', 'netflix'],
+  FRESH = ['com.disney.disneyplus-prod'],
+  FREE = ['youtube.leanback.v4'],
+  SETTLE = 1500, // after closing an app, before starting it again
   INPUT = /^com\.webos\.app\.(hdmi\d+|externalinput\.[\w-]+)$/;
 
 // running: the list of applicationManager/running; apps: the launcher's apps ({id, title})
@@ -94,6 +100,16 @@ function create(ctx) {
     }
     return closed;
   }
+  async function beforeLaunch(id, settle) {
+    const cfg = ctx.config ? ctx.config.get() : {},
+      fresh = Array.isArray(cfg.freshApps) ? cfg.freshApps : FRESH,
+      free = Array.isArray(cfg.freshCloses) ? cfg.freshCloses : FREE;
+    if (fresh.indexOf(id) < 0) return [];
+    const closed = [];
+    for (const o of (await list()).apps.map(x => x.id)) if ((o === id || free.indexOf(o) >= 0) && (await close(o))) closed.push(o);
+    if (closed.indexOf(id) >= 0) await new Promise(r => setTimeout(r, settle === undefined ? SETTLE : settle));
+    return closed;
+  }
   async function handle(req, res, u, body) {
     if (u === '/api/running') return web.json(res, await list());
     if (u === '/api/running/close' && req.method === 'POST') {
@@ -113,6 +129,7 @@ function create(ctx) {
     list,
     close,
     closeIdle,
+    beforeLaunch,
     start: () => setInterval(() => closeIdle(Date.now()).catch(() => {}), 60000),
   };
 }

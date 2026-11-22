@@ -188,6 +188,8 @@ function create(ctx) {
     if (u === '/api/launch' && req.method === 'POST') {
       const b = await body(req);
       if (!/^[\w.\-]+$/.test(b.id || '')) return web.json(res, { error: 'bad id' }, 400);
+      const run = ctx.feature && ctx.feature('running'); // Disney+ starts anew (running.js)
+      if (run && run.beforeLaunch) await run.beforeLaunch(b.id).catch(() => []);
       return web.json(res, await luna('luna://com.webos.applicationManager/launch', { id: b.id, params: b.params || {} }));
     }
     if (u === '/api/config' && req.method === 'POST') {

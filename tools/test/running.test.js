@@ -124,7 +124,7 @@ run(async () => {
   last2['youtube.leanback.v4'] = t0 + 101 * MIN;
   ok((await pre.closeIdle(t0 + 110 * MIN)).length === 0, 'an app you opened is not a preloaded one: it waits the 30 minutes on Home');
 
-  // YouTube, Netflix and Disney+ stay open on Home, and go 15 minutes after another app or an input came to the front
+  // YouTube and Netflix stay open on Home, and go 15 minutes after another app or an input came to the front
   cfg = {};
   fg = 'com.webos.app.home';
   const keep = running.create({
@@ -146,4 +146,21 @@ run(async () => {
   fg = 'netflix';
   await keep.closeIdle(t0 + 141 * MIN);
   ok((await keep.closeIdle(t0 + 156 * MIN)).join() === 'youtube.leanback.v4', 'Netflix in front stays; YouTube goes after 15 minutes');
+
+  // Disney+ starts anew: opening it closes it if it is open (it comes back grey on webOS 5) and YouTube, so it has the memory
+  const appsD = appsI.concat([{ id: 'com.disney.disneyplus-prod', title: 'Disney+' }]);
+  const fresh = running.create({
+    luna,
+    config: { get: () => cfg },
+    feature: n => (n === 'apps' ? { apps: async () => appsD, front: () => fg, lastFront: () => 0 } : null),
+  });
+  cfg = {};
+  runningNow = [{ id: 'netflix' }, { id: 'youtube.leanback.v4' }, { id: 'com.disney.disneyplus-prod' }, { id: 'com.webos.app.hdmi3' }];
+  ok(
+    (await fresh.beforeLaunch('com.disney.disneyplus-prod', 0)).join() === 'youtube.leanback.v4,com.disney.disneyplus-prod',
+    'opening Disney+ closes it and YouTube first; Netflix keeps its 15 minutes, never an input'
+  );
+  ok((await fresh.beforeLaunch('netflix', 0)).length === 0, 'another app opens as before');
+  cfg = { freshApps: [] };
+  ok((await fresh.beforeLaunch('com.disney.disneyplus-prod', 0)).length === 0, '"freshApps": [] opens Disney+ as before');
 });
