@@ -35,7 +35,9 @@ the place to edit them, with a comment on each:
 LG preloads at most five apps, Home and the inputs included, and only while memory allows, so an added app may need another one
 switched off (as shipped HDMI 2 is, on a TV where it has cameras). The lists differ between TVs: a file `preload-add` or `preload-off` in `/media/developer/cleanyourtv` on a
 TV replaces that list for that TV. Both last until the next restart and are applied again at every start; switching Debloat off lifts
-them.
+them. Switching the TV off and on with the remote (not a restart) turns LG's own choice back on, so while the debloat is applied the
+service compares the preloader's policy with the lists every two minutes and sets it again where it differs (`helper/debloat.js`; the
+service log then says `preload set again: off com.webos.app.browser`).
 
 Nothing is uninstalled. It applies only while the launcher is Home, because LG's own Home needs some of those services to start;
 switching back to LG's Home lifts the debloat first.

@@ -28,6 +28,12 @@ reload() {
   luna-send -n 1 -w 10000 luna://com.webos.service.config/reconfigure '{}' </dev/null >/dev/null 2>&1
   systemctl restart preload-manager.service && sleep 3
 }
+# the lists as the service reads them (debloat.js sets the policy again when LG turned its own choice back on)
+if [ "$1" = lists ]; then
+  echo add $(ids preload-add "$PRELOAD_ADD")
+  echo off $(ids preload-off "$PRELOAD_OFF")
+  exit 0
+fi
 if [ "$1" = undo ]; then
   if grep -q " $F " /proc/mounts; then umount $F && rm -f $T && reload; fi
   for id in $(ids preload-off "$PRELOAD_OFF"); do policy $id true; done

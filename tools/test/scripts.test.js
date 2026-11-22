@@ -55,6 +55,16 @@ run(async () => {
     pids === 'netflix|com.webos.app.hdmi1',
     'preload.conf gives the lists (Netflix added), a file on the TV replaces one, a bad id is dropped: ' + pids
   );
+  const listed = cp.spawnSync('sh', [path.join(root, 'scripts', 'preload.sh'), 'lists'], {
+    encoding: 'utf8',
+    env: Object.assign({}, process.env, { PATH: process.env.PATH }),
+  });
+  ok(
+    !/^PRELOAD_ADD/m.test(preSh.split('if [ "$1" = lists ]')[1] || 'x') &&
+      /^add( |$)/m.test(listed.stdout) &&
+      /^off( |$)/m.test(listed.stdout),
+    'preload.sh lists prints the two lists for the service, and changes nothing: ' + JSON.stringify(listed.stdout)
+  );
   ok(
     /sh \$L\/preload\.sh$/m.test(fs.readFileSync(path.join(root, 'scripts', 'debloat-stop.sh'), 'utf8')) &&
       /preload\.sh undo/.test(fs.readFileSync(path.join(root, 'scripts', 'debloat-undo.sh'), 'utf8')) &&

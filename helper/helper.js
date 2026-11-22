@@ -60,6 +60,7 @@ if (notify) load('notifyapi', () => require('./notifyapi').create(ctx));
 const manager = load('manager', () => require('./manager').create(ctx));
 load('apps', () => require('./apps').create(ctx));
 load('running', () => require('./running').create(ctx));
+load('debloat', () => require('./debloat').create(ctx));
 load('trailers', () => require('./trailers').create(ctx));
 load('radio', () => require('./radio').create());
 load('ambient', () => require('./ambient').create(ctx));
