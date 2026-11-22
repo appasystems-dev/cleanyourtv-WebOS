@@ -12,8 +12,8 @@
 // once from Home: they stay open, preloaded or not, while Home is in front, and go 15 minutes after another app or an input came to the
 // front (three times an hour at most, too). Never an input (HDMI) and never the app in front. "closeIdle": false keeps them all.
 // An app of FRESH ("freshApps") is always started anew from the launcher: Disney+ on a webOS 5 TV stays on a grey screen when it comes
-// back from the background (left with Home, or preloaded hidden). Opening it closes it first if it is open, and the apps of FREE
-// ("freshCloses", YouTube) too, so it has the memory to start in; Netflix keeps its 15 minutes (beforeLaunch, called by apps.js).
+// back from the background (left with Home, or preloaded hidden). Opening it closes it first if it is open and waits until it is gone
+// (beforeLaunch, called by apps.js); no other app is closed for it. It is not kept open on Home: it would be started anew anyway.
 const web = require('./web');
 
 const HOME = 'com.webos.app.home',
@@ -25,8 +25,7 @@ const HOME = 'com.webos.app.home',
   AWAY = 15 * 60 * 1000,
   KEEP = ['youtube.leanback.v4', 'netflix'],
   FRESH = ['com.disney.disneyplus-prod'],
-  FREE = ['youtube.leanback.v4'],
-  SETTLE = 1500, // after closing an app, before starting it again
+  GONE = 5000, // how long to wait for a closed app to leave the running list
   INPUT = /^com\.webos\.app\.(hdmi\d+|externalinput\.[\w-]+)$/;
 
 // running: the list of applicationManager/running; apps: the launcher's apps ({id, title})
@@ -100,15 +99,16 @@ function create(ctx) {
     }
     return closed;
   }
-  async function beforeLaunch(id, settle) {
+  // step: how often the running list is asked while waiting (tests pass 0)
+  async function beforeLaunch(id, step) {
     const cfg = ctx.config ? ctx.config.get() : {},
       fresh = Array.isArray(cfg.freshApps) ? cfg.freshApps : FRESH,
-      free = Array.isArray(cfg.freshCloses) ? cfg.freshCloses : FREE;
-    if (fresh.indexOf(id) < 0) return [];
-    const closed = [];
-    for (const o of (await list()).apps.map(x => x.id)) if ((o === id || free.indexOf(o) >= 0) && (await close(o))) closed.push(o);
-    if (closed.indexOf(id) >= 0) await new Promise(r => setTimeout(r, settle === undefined ? SETTLE : settle));
-    return closed;
+      every = step === undefined ? 250 : step,
+      isOpen = async () => (await list()).apps.some(x => x.id === id);
+    if (fresh.indexOf(id) < 0 || !(await isOpen()) || !(await close(id))) return false;
+    // starting it while the app manager still closes it fails ("could not open"): wait until it has left the running list
+    for (let waited = 0; waited < GONE && (await isOpen()); waited += every || 1) await new Promise(r => setTimeout(r, every));
+    return true;
   }
   async function handle(req, res, u, body) {
     if (u === '/api/running') return web.json(res, await list());

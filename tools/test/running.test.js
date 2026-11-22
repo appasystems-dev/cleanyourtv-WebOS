@@ -147,20 +147,33 @@ run(async () => {
   await keep.closeIdle(t0 + 141 * MIN);
   ok((await keep.closeIdle(t0 + 156 * MIN)).join() === 'youtube.leanback.v4', 'Netflix in front stays; YouTube goes after 15 minutes');
 
-  // Disney+ starts anew: opening it closes it if it is open (it comes back grey on webOS 5) and YouTube, so it has the memory
+  // Disney+ starts anew: opening it closes it if it is open (it comes back grey on webOS 5) and waits until it is gone; nothing else
   const appsD = appsI.concat([{ id: 'com.disney.disneyplus-prod', title: 'Disney+' }]);
+  let leaving = -1; // after a close, the app manager still lists Disney+ for this many answers
   const fresh = running.create({
-    luna,
+    luna: async (uri, p) => {
+      if (/closeByAppId$/.test(uri) && p.id === 'com.disney.disneyplus-prod') leaving = 2;
+      if (/running$/.test(uri) && leaving >= 0 && leaving-- === 0)
+        runningNow = runningNow.filter(a => a.id !== 'com.disney.disneyplus-prod');
+      return luna(uri, p);
+    },
     config: { get: () => cfg },
     feature: n => (n === 'apps' ? { apps: async () => appsD, front: () => fg, lastFront: () => 0 } : null),
   });
   cfg = {};
   runningNow = [{ id: 'netflix' }, { id: 'youtube.leanback.v4' }, { id: 'com.disney.disneyplus-prod' }, { id: 'com.webos.app.hdmi3' }];
+  calls = [];
+  const opened = await fresh.beforeLaunch('com.disney.disneyplus-prod', 0);
   ok(
-    (await fresh.beforeLaunch('com.disney.disneyplus-prod', 0)).join() === 'youtube.leanback.v4,com.disney.disneyplus-prod',
-    'opening Disney+ closes it and YouTube first; Netflix keeps its 15 minutes, never an input'
+    opened === true &&
+      calls.filter(c => /^close/.test(c)).join() === 'closeByAppId com.disney.disneyplus-prod' &&
+      calls.filter(c => /^running/.test(c)).length === 4 &&
+      runningNow.length === 3,
+    'opening Disney+ closes only Disney+, and waits until it has left the running list: ' + calls.join('; ')
   );
-  ok((await fresh.beforeLaunch('netflix', 0)).length === 0, 'another app opens as before');
+  ok((await fresh.beforeLaunch('com.disney.disneyplus-prod', 0)) === false, 'not open: it just opens');
+  runningNow = [{ id: 'netflix' }, { id: 'com.disney.disneyplus-prod' }];
+  ok((await fresh.beforeLaunch('netflix', 0)) === false, 'another app opens as before');
   cfg = { freshApps: [] };
-  ok((await fresh.beforeLaunch('com.disney.disneyplus-prod', 0)).length === 0, '"freshApps": [] opens Disney+ as before');
+  ok((await fresh.beforeLaunch('com.disney.disneyplus-prod', 0)) === false, '"freshApps": [] opens Disney+ as before');
 });

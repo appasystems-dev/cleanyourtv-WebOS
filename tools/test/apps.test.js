@@ -41,6 +41,23 @@ run(async () => {
   r = await call(apps, '/api/launch', 'POST', { id: 'bad id' });
   ok(r.code === 400, 'a bad app id is refused');
 
+  // Disney+ just closed to start anew can still be on its way out: a refused start is tried once more
+  let starts = 0;
+  const anew = req('apps').create({
+    config: memoryConfig({}),
+    luna: async uri => (/launch$/.test(uri) ? { returnValue: ++starts > 1 } : { returnValue: true }),
+    version: '1.6.0',
+    feature: n => (n === 'running' ? { beforeLaunch: async id => id === 'com.disney.disneyplus-prod' } : null),
+  });
+  r = await call(anew, '/api/launch', 'POST', { id: 'com.disney.disneyplus-prod' });
+  const once = starts;
+  starts = 0;
+  const other = await call(anew, '/api/launch', 'POST', { id: 'netflix' });
+  ok(
+    r.j.returnValue === true && once === 2 && other.j.returnValue === false && starts === 1,
+    'Disney+ started anew is tried once more when refused; another app is not'
+  );
+
   // names for the inputs, given on the TV: kept with the launcher settings, shown in every inputs list, LG's name beside it
   await call(apps, '/api/config', 'POST', {
     dock: ['a.one'],

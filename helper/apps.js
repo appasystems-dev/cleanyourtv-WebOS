@@ -188,9 +188,13 @@ function create(ctx) {
     if (u === '/api/launch' && req.method === 'POST') {
       const b = await body(req);
       if (!/^[\w.\-]+$/.test(b.id || '')) return web.json(res, { error: 'bad id' }, 400);
-      const run = ctx.feature && ctx.feature('running'); // Disney+ starts anew (running.js)
-      if (run && run.beforeLaunch) await run.beforeLaunch(b.id).catch(() => []);
-      return web.json(res, await luna('luna://com.webos.applicationManager/launch', { id: b.id, params: b.params || {} }));
+      const run = ctx.feature && ctx.feature('running'), // Disney+ starts anew (running.js)
+        anew = run && run.beforeLaunch ? await run.beforeLaunch(b.id).catch(() => false) : false,
+        start = () => luna('luna://com.webos.applicationManager/launch', { id: b.id, params: b.params || {} });
+      let r = await start();
+      // just closed, it can still be on its way out: once more a moment later
+      if (anew && r.returnValue === false) r = await new Promise(ok => setTimeout(ok, 1500)).then(start);
+      return web.json(res, r);
     }
     if (u === '/api/config' && req.method === 'POST') {
       saveLauncherConfig(await body(req));
